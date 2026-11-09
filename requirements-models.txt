@@ -1,0 +1,6 @@
+-r requirements.txt
+# Optional automatic cutout / scene models. Weights are downloaded separately.
+rembg>=2.0,<3
+onnxruntime>=1.17,<2
+torch>=2.5,<3
+transformers>=5.8,<6

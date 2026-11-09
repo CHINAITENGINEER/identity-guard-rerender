@@ -1,0 +1,406 @@
+{
+  "schema_version": "strict-compositor-private-holdout-v1",
+  "source_set": "未命名文件夹 3",
+  "mapping_rule": "sort raw product filenames case-insensitively, take consecutive groups of three, and pair them with case-insensitively sorted raw background filenames",
+  "policy": {
+    "evaluation_only": true,
+    "allow_training": false,
+    "allow_finetuning": false,
+    "allow_prompt_tuning": false,
+    "allow_parameter_tuning": false,
+    "allow_threshold_tuning": false,
+    "allow_candidate_selection_across_retries": false,
+    "decode_existing_composites": false,
+    "generated_assets_in_scope": false,
+    "human_visual_review_after_freeze": true
+  },
+  "counts": {
+    "cases": 10,
+    "products": 30,
+    "backgrounds": 10
+  },
+  "dataset_sha256": "6066cc3a5dd1d31cc87496a32037927b5aab8c7f7271962d15a6f9970f66fc26",
+  "cases": [
+    {
+      "case_id": "set_b_01",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_001",
+        "role": "background",
+        "relative_path": "背景图/DSC09515.JPG",
+        "filename": "DSC09515.JPG",
+        "size_bytes": 4508181,
+        "sha256": "ab0f288b97a92824b105f0b09a4074a357ffe80ba3cccdb8c24ccf85d9aab784"
+      },
+      "products": [
+        {
+          "asset_id": "product_001",
+          "role": "product",
+          "relative_path": "物品图/DSC09625.JPG",
+          "filename": "DSC09625.JPG",
+          "size_bytes": 3962853,
+          "sha256": "444c3753695eba1fc1382e7f630796c3e88a1acf1bcf73f5e26554a37619ace3"
+        },
+        {
+          "asset_id": "product_002",
+          "role": "product",
+          "relative_path": "物品图/DSC09626.JPG",
+          "filename": "DSC09626.JPG",
+          "size_bytes": 3688219,
+          "sha256": "ecfe9f33e9f46c8d7758cce3ebccda8b5b86a764e50101c3cfc43d6f5ebd2916"
+        },
+        {
+          "asset_id": "product_003",
+          "role": "product",
+          "relative_path": "物品图/DSC09627.JPG",
+          "filename": "DSC09627.JPG",
+          "size_bytes": 3512522,
+          "sha256": "7f1c90d9923c16a5a61dbd724a4553241dee4fa845b6549255fa583e88d5f721"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_02",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_002",
+        "role": "background",
+        "relative_path": "背景图/DSC09516.JPG",
+        "filename": "DSC09516.JPG",
+        "size_bytes": 3813032,
+        "sha256": "d4a2549726f7882ad29a3aa410a4020a38658cf3a8f94bf9ce4ca572c938b1de"
+      },
+      "products": [
+        {
+          "asset_id": "product_004",
+          "role": "product",
+          "relative_path": "物品图/DSC09628.JPG",
+          "filename": "DSC09628.JPG",
+          "size_bytes": 3811691,
+          "sha256": "5c9f2616c74b8a3d5149ac5b6c749066f1fb712c6fd187c95a55d02d8ce63560"
+        },
+        {
+          "asset_id": "product_005",
+          "role": "product",
+          "relative_path": "物品图/DSC09629.JPG",
+          "filename": "DSC09629.JPG",
+          "size_bytes": 3681750,
+          "sha256": "d8e828118196a4fd1260087bcb78bd9a5bf8780efedcf2f2d190935f6613a835"
+        },
+        {
+          "asset_id": "product_006",
+          "role": "product",
+          "relative_path": "物品图/DSC09630.JPG",
+          "filename": "DSC09630.JPG",
+          "size_bytes": 3604834,
+          "sha256": "3f12ff0eeb2a2709e7189c42dcdfd09c3eee1da40ed3a6da1dab19cf9fac743a"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_03",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_003",
+        "role": "background",
+        "relative_path": "背景图/DSC09517.JPG",
+        "filename": "DSC09517.JPG",
+        "size_bytes": 3395542,
+        "sha256": "48d84f5ddc4f4656f96ea9d70145bf439dc4443e2ba7ee58c6089c9563fecf97"
+      },
+      "products": [
+        {
+          "asset_id": "product_007",
+          "role": "product",
+          "relative_path": "物品图/DSC09631.JPG",
+          "filename": "DSC09631.JPG",
+          "size_bytes": 2507655,
+          "sha256": "2042e752b2b9d8074fd98b08f3746578e6e4a95c40a18f1170dbb4c3e7d2c004"
+        },
+        {
+          "asset_id": "product_008",
+          "role": "product",
+          "relative_path": "物品图/DSC09632.JPG",
+          "filename": "DSC09632.JPG",
+          "size_bytes": 2746898,
+          "sha256": "5935bc1a3665945929ee50a2571ce71627a607550624d40b16914aac6bd7651f"
+        },
+        {
+          "asset_id": "product_009",
+          "role": "product",
+          "relative_path": "物品图/DSC09633.JPG",
+          "filename": "DSC09633.JPG",
+          "size_bytes": 2736098,
+          "sha256": "2a2aea92b7f102d417c21bca352d1d7bb8665b8aa8d62f75ca5e4a95fcf638cc"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_04",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_004",
+        "role": "background",
+        "relative_path": "背景图/DSC09519.JPG",
+        "filename": "DSC09519.JPG",
+        "size_bytes": 3612273,
+        "sha256": "8cf73f9c5d1799e7fee581b037aa8a4852adf6b7a967702703c923a901e43101"
+      },
+      "products": [
+        {
+          "asset_id": "product_010",
+          "role": "product",
+          "relative_path": "物品图/DSC09634.JPG",
+          "filename": "DSC09634.JPG",
+          "size_bytes": 3108541,
+          "sha256": "2ece4e4c53c1e71f87d2a53db861e5c3f581a38d9f81b50d9cc46fc125484647"
+        },
+        {
+          "asset_id": "product_011",
+          "role": "product",
+          "relative_path": "物品图/DSC09734.JPG",
+          "filename": "DSC09734.JPG",
+          "size_bytes": 4228001,
+          "sha256": "2f00b7248c70cec2d499021668e6a6de8e13afcbbd77570860002c8d44616585"
+        },
+        {
+          "asset_id": "product_012",
+          "role": "product",
+          "relative_path": "物品图/DSC09735.JPG",
+          "filename": "DSC09735.JPG",
+          "size_bytes": 5197084,
+          "sha256": "54e8cb097267231f0cab20a74a612f8601c49e7a585c7f46b87fe0eec327273a"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_05",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_005",
+        "role": "background",
+        "relative_path": "背景图/DSC09520.JPG",
+        "filename": "DSC09520.JPG",
+        "size_bytes": 3865571,
+        "sha256": "0c7e2c006d488a1689426c5af4af1aa70aaa4ff7adc266efc80e01a1406f9c78"
+      },
+      "products": [
+        {
+          "asset_id": "product_013",
+          "role": "product",
+          "relative_path": "物品图/DSC09737.JPG",
+          "filename": "DSC09737.JPG",
+          "size_bytes": 5677854,
+          "sha256": "f8209d68755ac3ff360c3bfe4482af4ae32bb35d09d1fb8c1766b71ad699590b"
+        },
+        {
+          "asset_id": "product_014",
+          "role": "product",
+          "relative_path": "物品图/DSC09738.JPG",
+          "filename": "DSC09738.JPG",
+          "size_bytes": 5541258,
+          "sha256": "436128a81b88b442865a1a3504882be001aef2028db8a3c23c03564c2bb48e2b"
+        },
+        {
+          "asset_id": "product_015",
+          "role": "product",
+          "relative_path": "物品图/DSC09741.JPG",
+          "filename": "DSC09741.JPG",
+          "size_bytes": 3834252,
+          "sha256": "5ff5151eb1aa6e9f547215ad9b9b1b97db9bac0cbabcfe7ee50bf439fcdd3033"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_06",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_006",
+        "role": "background",
+        "relative_path": "背景图/DSC09522.JPG",
+        "filename": "DSC09522.JPG",
+        "size_bytes": 4421734,
+        "sha256": "68004cfab2d322fb6a200bf5fb232f0dc6bb7f1fc1e53c378284decb8ed67f89"
+      },
+      "products": [
+        {
+          "asset_id": "product_016",
+          "role": "product",
+          "relative_path": "物品图/DSC09743.JPG",
+          "filename": "DSC09743.JPG",
+          "size_bytes": 5668102,
+          "sha256": "fe954d4db6a6326d6170525885feaefca432ad41651dce47e7bcdf2eaf820872"
+        },
+        {
+          "asset_id": "product_017",
+          "role": "product",
+          "relative_path": "物品图/DSC09744.JPG",
+          "filename": "DSC09744.JPG",
+          "size_bytes": 3389456,
+          "sha256": "256fc51013eaf0f404f002fa4198a5c17b0e6d97bdcac3849cff18d54e2a4d44"
+        },
+        {
+          "asset_id": "product_018",
+          "role": "product",
+          "relative_path": "物品图/DSC09745.JPG",
+          "filename": "DSC09745.JPG",
+          "size_bytes": 4348249,
+          "sha256": "35df948638da09979473c53f1b071d1f2a243aebab8e81e6ca73a414465a6110"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_07",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_007",
+        "role": "background",
+        "relative_path": "背景图/DSC09523.JPG",
+        "filename": "DSC09523.JPG",
+        "size_bytes": 4440951,
+        "sha256": "a18c1ab5272e61baa41aaa6514c71e2e8dca7f02e0498c3f0b79f4f2c61b0ea1"
+      },
+      "products": [
+        {
+          "asset_id": "product_019",
+          "role": "product",
+          "relative_path": "物品图/DSC09746.JPG",
+          "filename": "DSC09746.JPG",
+          "size_bytes": 4677537,
+          "sha256": "da690fef72700081873a63caca35a02118ea2b307e3fef8ceda34ba2f966fd45"
+        },
+        {
+          "asset_id": "product_020",
+          "role": "product",
+          "relative_path": "物品图/DSC09750.JPG",
+          "filename": "DSC09750.JPG",
+          "size_bytes": 5181199,
+          "sha256": "aa189fcb66c78bbaf7020a6bc2c2a22e489ff8f134ad5399f46b18e367546b23"
+        },
+        {
+          "asset_id": "product_021",
+          "role": "product",
+          "relative_path": "物品图/DSC09782.JPG",
+          "filename": "DSC09782.JPG",
+          "size_bytes": 4244117,
+          "sha256": "7a622493a31626ed8daab45ae9bd829b2149c1e00dac4d83cb203b51dbb71acc"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_08",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_008",
+        "role": "background",
+        "relative_path": "背景图/DSC09524.JPG",
+        "filename": "DSC09524.JPG",
+        "size_bytes": 3333016,
+        "sha256": "dab31f7626980318b008548a47ef8cb9df9c71026b6f4f53ebbf0acce96ec87f"
+      },
+      "products": [
+        {
+          "asset_id": "product_022",
+          "role": "product",
+          "relative_path": "物品图/DSC09783.JPG",
+          "filename": "DSC09783.JPG",
+          "size_bytes": 4285950,
+          "sha256": "bd971a959fc3c55e7c3d4400924dd7bf890e6e83205c5082400b21d3304e01a3"
+        },
+        {
+          "asset_id": "product_023",
+          "role": "product",
+          "relative_path": "物品图/DSC09784.JPG",
+          "filename": "DSC09784.JPG",
+          "size_bytes": 3470587,
+          "sha256": "91a1f8a292115dd6553c5aabec2e8371601e5d521f21eb2662fda261645c5b4a"
+        },
+        {
+          "asset_id": "product_024",
+          "role": "product",
+          "relative_path": "物品图/DSC09785.JPG",
+          "filename": "DSC09785.JPG",
+          "size_bytes": 3570265,
+          "sha256": "eba29679f92f80237021014eb2c6eefc35cb520a67e3a89126d187f5a3323f78"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_09",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_009",
+        "role": "background",
+        "relative_path": "背景图/DSC09525.JPG",
+        "filename": "DSC09525.JPG",
+        "size_bytes": 3494371,
+        "sha256": "0b55fec077eb42f85cc4427fbbe2a5339eb42294332b8a3e34f2e06ee3455817"
+      },
+      "products": [
+        {
+          "asset_id": "product_025",
+          "role": "product",
+          "relative_path": "物品图/DSC09786.JPG",
+          "filename": "DSC09786.JPG",
+          "size_bytes": 5251126,
+          "sha256": "589ab4425abac1d68ac081373fa9ce950c38713329c48568146c8560382a1ecb"
+        },
+        {
+          "asset_id": "product_026",
+          "role": "product",
+          "relative_path": "物品图/DSC09787.JPG",
+          "filename": "DSC09787.JPG",
+          "size_bytes": 4230255,
+          "sha256": "698929274cf73314916218040068633e63200c2910bce9c0c5f966a17fafe933"
+        },
+        {
+          "asset_id": "product_027",
+          "role": "product",
+          "relative_path": "物品图/DSC09788.JPG",
+          "filename": "DSC09788.JPG",
+          "size_bytes": 4863655,
+          "sha256": "4e38d8aca01df84b1cbca129c7117f66f68844340d7ecf667dfb2b15f0a5a804"
+        }
+      ]
+    },
+    {
+      "case_id": "set_b_10",
+      "split": "blind_holdout",
+      "background": {
+        "asset_id": "background_010",
+        "role": "background",
+        "relative_path": "背景图/DSC09527.JPG",
+        "filename": "DSC09527.JPG",
+        "size_bytes": 3405379,
+        "sha256": "bd233df42ca2dafb4dbbe1fe534376f8628d0071f4adb0cf8349a855a201d7c8"
+      },
+      "products": [
+        {
+          "asset_id": "product_028",
+          "role": "product",
+          "relative_path": "物品图/DSC09789.JPG",
+          "filename": "DSC09789.JPG",
+          "size_bytes": 3964927,
+          "sha256": "6de1edc5a9e72216ebe4d8f587b10576ed57afb825d837d63b7a35bfeb6c032e"
+        },
+        {
+          "asset_id": "product_029",
+          "role": "product",
+          "relative_path": "物品图/DSC09790.JPG",
+          "filename": "DSC09790.JPG",
+          "size_bytes": 5045867,
+          "sha256": "3df785208961f1249929793fb4617eca8b84b3878b700359ca24fb4530f56980"
+        },
+        {
+          "asset_id": "product_030",
+          "role": "product",
+          "relative_path": "物品图/DSC09791.JPG",
+          "filename": "DSC09791.JPG",
+          "size_bytes": 4867252,
+          "sha256": "f7ca8e3face12b094dde25bbdc991ee80dc4fa7ac3a6ba01be92a9e95d96e6de"
+        }
+      ]
+    }
+  ],
+  "manifest_sha256": "9e5db6f64883af021b06ee9c94dbee443201befd4b4de38f791ecb1173581531"
+}

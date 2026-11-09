@@ -1,0 +1,1750 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>商品场景合成 Studio</title>
+  <style>
+    :root{
+      --bg:#080d16;--panel:#101827;--card:#141f31;--line:#273750;
+      --text:#edf4ff;--muted:#8fa1ba;--blue:#4386f5;--green:#22ad78;
+      --amber:#ffbd62;--red:#ff6b75;--shadow:0 18px 46px rgba(0,0,0,.28)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 80% 0,#132139 0,#080d16 38%);color:var(--text);font:14px/1.5 Inter,system-ui,"Microsoft YaHei",sans-serif}
+    button,input,select{font:inherit}
+    button{border:0;border-radius:10px;padding:10px 13px;color:white;background:#30415d;cursor:pointer;transition:.16s transform,.16s filter}
+    button:hover{filter:brightness(1.12)}button:active{transform:translateY(1px)}button:disabled{opacity:.42;cursor:not-allowed}
+    button.primary{background:linear-gradient(135deg,#4386f5,#2769d8);font-weight:700}
+    button.success{background:linear-gradient(135deg,#24b980,#16855d);font-weight:700}
+    button.ghost{background:#1b2940;border:1px solid #31445f}
+    input,select{width:100%;padding:9px 10px;border-radius:9px;border:1px solid #32445f;background:#0b1321;color:#fff;outline:none}
+    input:focus,select:focus{border-color:#5d9aff;box-shadow:0 0 0 3px rgba(67,134,245,.13)}
+    .app{display:grid;grid-template-columns:390px minmax(0,1fr);min-height:100vh}
+    .sidebar{height:100vh;overflow:auto;padding:20px;background:rgba(15,23,38,.97);border-right:1px solid #233047}
+    .brand{display:flex;align-items:center;gap:11px;margin-bottom:5px}.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#55a1ff,#23b981);box-shadow:0 8px 25px rgba(59,139,238,.28)}
+    h1{font-size:19px;margin:0}.subtitle,.hint,.meta{color:var(--muted);font-size:12px}.subtitle{margin:0 0 18px 45px}
+    .section{margin-top:17px}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:700;color:#cfe0fa}.step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#1e3150;color:#8fc0ff;font-size:12px;margin-right:7px}
+    .row{display:flex;gap:8px}.row>*{min-width:0}.grow{flex:1}.w80{width:80px}.w100{width:100px}
+    .card{background:linear-gradient(160deg,#152136,#101a2b);border:1px solid var(--line);border-radius:13px;padding:11px;margin:9px 0;box-shadow:0 7px 20px rgba(0,0,0,.12)}
+    .product-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.quality{padding:2px 7px;border-radius:99px;background:#20304a;color:#9eb2cf;font-size:11px}.quality.pass{background:#123b31;color:#74e4b4}.quality.review{background:#493321;color:#ffc77a}
+    .file-line{margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8295ae;font-size:11px}
+    .product-controls{display:grid;grid-template-columns:1fr 1fr 74px;gap:7px;margin-top:8px}
+    .selection-note{margin-top:7px;padding:6px 8px;border-radius:8px;background:#0c1626;color:#8fa1ba;font-size:11px}
+    .selection-note.active{background:#113229;color:#79ddb2}
+    .size-row{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin-top:9px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.actions .wide{grid-column:1/-1;font-size:15px;padding:12px}
+    .check{display:flex;gap:8px;align-items:center;color:#c8d4e6}.check input{width:auto}
+    details{margin-top:11px;border:1px solid #26354d;border-radius:10px;padding:9px;background:#0e1726}summary{cursor:pointer;color:#aebed5}
+    .integration-grid{display:grid;gap:8px;margin-top:10px}.integration-row{display:grid;grid-template-columns:112px 1fr;gap:8px;align-items:center}.integration-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-top:9px}.secret-note{margin-top:7px;color:#8195b0;font-size:11px}.cloud-state{margin-top:8px;padding:8px;border-radius:8px;background:#101c2e;color:#a7b8cf;font-size:12px}
+    textarea{width:100%;min-height:76px;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #30415d;background:#09111e;color:#d7e6fb;resize:vertical}
+    .status{margin-top:12px;padding:11px;border-radius:11px;background:#17253a;color:#b9c7da;white-space:pre-wrap}.status.ok{color:#78e2b3;background:#133229}.status.warn{color:#ffd087;background:#372b1f}.status.busy{color:#aecdff;background:#172a45}
+    .main{min-width:0;padding:18px 22px 50px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}.topbar h2{font-size:17px;margin:0}.badges{display:flex;gap:7px;flex-wrap:wrap}.badge{border:1px solid #2d405d;background:#101b2b;border-radius:99px;padding:4px 9px;color:#9fb1ca;font-size:11px}.badge.good{color:#73dfad;border-color:#245c4a}.badge.manual{color:#ffcf86;border-color:#66502d}
+    .workspace{background:#0a111d;border:1px solid #27364e;border-radius:15px;min-height:560px;padding:12px;box-shadow:var(--shadow);overflow:auto}
+    .empty{min-height:520px;display:grid;place-items:center;color:#72849e;text-align:center}.empty[hidden]{display:none}.empty b{display:block;color:#a9bad2;margin-bottom:6px}
+    .stage{position:relative;display:inline-block;line-height:0;user-select:none;touch-action:none}.stage[hidden]{display:none}.stage>img{display:block;max-width:100%;max-height:76vh;border-radius:8px}
+    .overlay{position:absolute;inset:0;line-height:normal}.surface-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+    .surface{fill:rgba(36,185,128,.11);stroke:#49d6a1;stroke-width:.26;stroke-dasharray:1.1 1}.protected{fill:rgba(255,93,102,.14);stroke:#ff727b;stroke-width:.3;stroke-dasharray:1 1}
+    .item{position:absolute;border:1.5px solid rgba(111,177,255,.92);border-radius:7px;background:rgba(61,129,230,.05);cursor:grab;touch-action:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+    .item:active{cursor:grabbing}.item.selected{border-color:#70f0bd;box-shadow:0 0 0 2px rgba(61,223,164,.16)}
+    .item img{width:100%;height:100%;object-fit:fill;pointer-events:none;display:block}
+    .label{position:absolute;left:3px;top:3px;padding:2px 5px;border-radius:5px;background:rgba(7,14,25,.76);font-size:10px;color:#d8e7fa;line-height:1.3}
+    .handle{position:absolute;right:-7px;bottom:-7px;width:15px;height:15px;border-radius:50%;background:#65e2b2;border:2px solid #0b1421;cursor:nwse-resize}
+    .baseline{position:absolute;left:10%;right:10%;bottom:-1px;border-bottom:1px solid rgba(255,213,112,.85)}
+    .result{margin-top:18px;background:#0e1725;border:1px solid #273750;border-radius:14px;padding:13px}.result img{display:block;max-width:100%;max-height:80vh;margin:auto;border-radius:8px}.result-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:9px}.result-title{font-weight:700}.audit{font-size:12px;color:#8fa1ba}
+    .roi-modal{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:rgba(3,7,13,.86);backdrop-filter:blur(8px)}
+    .roi-modal[hidden]{display:none}
+    .roi-panel{width:min(1120px,96vw);max-height:94vh;overflow:auto;padding:16px;border:1px solid #334865;border-radius:16px;background:#101a2a;box-shadow:0 28px 90px rgba(0,0,0,.58)}
+    .roi-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:12px}.roi-head h3{margin:0 0 3px;font-size:18px}.roi-head p{margin:0;color:#91a5c0}
+    .roi-workspace{display:grid;place-items:center;min-height:300px;padding:12px;border:1px solid #2a3c57;border-radius:12px;background:repeating-conic-gradient(#111b2a 0 25%,#0d1624 0 50%) 50%/24px 24px;overflow:auto}
+    .roi-stage{position:relative;display:inline-block;line-height:0;cursor:crosshair;touch-action:none;user-select:none}
+    .roi-stage img{display:block;max-width:min(1040px,88vw);max-height:70vh;pointer-events:none}
+    .roi-box{position:absolute;border:2px solid #65e2b2;background:rgba(58,205,153,.13);box-shadow:0 0 0 9999px rgba(2,6,12,.43),0 0 0 1px rgba(255,255,255,.65) inset;pointer-events:none}
+    .roi-box::after{content:attr(data-label);position:absolute;left:-2px;top:-29px;padding:4px 7px;border-radius:6px;background:#1aa775;color:white;font:12px/1.2 system-ui;white-space:nowrap}
+    .roi-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:12px}.roi-actions button{min-width:110px}
+    .image-browser-modal{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:24px;background:rgba(3,7,13,.86);backdrop-filter:blur(8px)}.image-browser-modal[hidden]{display:none}
+    .image-browser-panel{width:min(1180px,96vw);height:min(790px,92vh);display:grid;grid-template-rows:auto auto 1fr auto;gap:11px;padding:16px;border:1px solid #334865;border-radius:16px;background:#101a2a;box-shadow:0 28px 90px rgba(0,0,0,.58)}
+    .image-browser-bar{display:flex;gap:8px;align-items:center}.image-browser-path{min-width:0;flex:1}.image-browser-roots{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.image-browser-roots button{white-space:nowrap;padding:6px 10px}
+    .image-browser-content{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px}.image-browser-grid{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));align-content:start;gap:11px;padding:4px}.image-browser-item{min-height:136px;overflow:hidden;border:1px solid #2a3c57;border-radius:10px;background:#0c1522;color:#d7e4f7;cursor:pointer;text-align:left;padding:0}.image-browser-item:hover,.image-browser-item.selected{border-color:#65e2b2;box-shadow:0 0 0 2px rgba(101,226,178,.2)}.image-browser-item img{display:block;width:100%;height:102px;object-fit:cover;background:repeating-conic-gradient(#111b2a 0 25%,#0d1624 0 50%) 50%/18px 18px}.image-browser-item .folder-icon{height:102px;display:grid;place-items:center;font-size:40px;background:#15243a}.image-browser-item span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px;font-size:12px}.image-browser-preview{min-height:0;display:flex;flex-direction:column;gap:9px;border:1px solid #2a3c57;border-radius:10px;padding:10px;background:#0c1522}.image-browser-preview img{display:block;width:100%;min-height:0;max-height:calc(100% - 42px);object-fit:contain;background:repeating-conic-gradient(#111b2a 0 25%,#0d1624 0 50%) 50%/20px 20px;border-radius:7px}.image-browser-preview p{margin:0;word-break:break-all;color:#9eb1cc;font-size:12px}.image-browser-actions{display:flex;justify-content:flex-end;gap:9px}.image-browser-actions button{min-width:130px}
+    .spinner{display:inline-block;width:13px;height:13px;border:2px solid #426080;border-top-color:#8ec0ff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{height:auto}.main{padding:14px}.workspace{min-height:380px}.empty{min-height:350px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo"></span><h1>商品场景合成 Studio</h1></div>
+    <div class="subtitle">确定性商品像素 · 场景感知摆位 · 严格背景审计</div>
+
+    <section class="section">
+      <div class="section-title"><span><span class="step">1</span>背景与桌面</span><span id="sceneQuality" class="quality">未分析</span></div>
+      <div class="row"><input id="background" class="grow" oninput="backgroundPathChanged(this.value)" placeholder="选择或粘贴背景图片路径"><button id="loadBackgroundButton" onclick="loadBackground().catch(error=>setStatus(error.message,'warn'))">载入</button><button id="browseBackgroundButton" onclick="browseBackground()">浏览</button></div>
+      <div id="sceneMeta" class="file-line">载入后自动识别桌面、保护物和反射属性</div>
+    </section>
+
+    <section class="section">
+      <div class="section-title"><span><span class="step">2</span>三件商品</span></div>
+      <div id="productCards"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title"><span><span class="step">3</span>构图与输出</span></div>
+      <label class="check"><input id="autoRepair" type="checkbox" checked>手动摆位越界时自动做最小吸附</label>
+      <label class="check"><input id="strictAuditEnabled" type="checkbox">开启正式交付审计（调试阶段默认关闭）</label>
+      <label class="check"><input id="aiReviewAfterCompose" type="checkbox">合成后运行 MiniMax 辅助点评（可选，不影响下载）</label>
+      <label class="check"><input id="hybridRerenderEnabled" type="checkbox">启用身份保护的混合重渲染（实验）</label>
+      <div class="size-row"><label>候选来源</label><select id="hybridProvider"><option value="manual_candidate">上传 GPT/MiniMax 候选图</option><option value="runninghub">RunningHub 专用重渲染流程</option></select></div>
+      <div class="row"><input id="hybridCandidate" class="grow" placeholder="可选：选择完整候选图；RunningHub 模式可留空"><button onclick="browseHybridCandidate()">浏览</button></div>
+      <details><summary>局部重渲染提示词（可选）</summary><textarea id="hybridPrompt" rows="4" placeholder="留空会使用保守的透明材质提示词。只描述折射、高光、环境反射等允许变化，勿要求模型重画商品文字或背景。"></textarea></details>
+      <div class="selection-note active">文字、Logo、标签、商品轮廓和候选区外像素会从严格合成结果硬恢复；透明无字区域才允许采用模型像素。</div>
+      <div class="selection-note active">关闭审计只跳过末端像素/物理门禁；4K渲染、场景分析、云端抠图、材质路由、光影、倒影、分层PNG与光学Matte全部照常运行。</div>
+      <div class="actions">
+        <button id="prepareAllButton" class="primary wide" onclick="prepareAll()">一键准备：抠图 + 智能摆位</button>
+        <button id="autoLayoutButton" class="success wide" onclick="autoLayout()">智能构图</button>
+        <button id="repairLayoutButton" class="ghost" onclick="repairLayout()">仅修复越界</button>
+        <button class="ghost" onclick="resetView()">撤销到上次构图</button>
+        <button id="composeButton" class="primary wide" onclick="compose()">按当前摆位严格合成</button>
+      </div>
+      <div class="hint" style="margin-top:8px">拖动商品；拖右下圆点缩放。黄色底座线必须落在绿色桌面内；蓝色商品框和商品主体可以越出绿色边界。合成不会覆盖有效的手动位置。</div>
+    </section>
+
+    <details>
+      <summary>光影与倒影</summary>
+      <div class="size-row"><label>倒影策略</label><select id="reflectionMode"><option value="auto">场景自动</option><option value="off">关闭</option><option value="on">强制开启</option></select></div>
+      <div class="size-row"><label>倒影强度</label><input id="reflectionOpacity" type="number" min="0" max=".42" step=".01" value=".08"></div>
+      <div class="row" style="margin-top:8px"><div><div class="meta">投影方向 X</div><input id="shadowX" type="number" step=".05" value=".75"></div><div><div class="meta">投影方向 Y</div><input id="shadowY" type="number" step=".05" value="-.66"></div></div>
+      <div class="row" style="margin-top:8px"><div><div class="meta">长度</div><input id="shadowLength" type="number" step=".01" value=".040"></div><div><div class="meta">深度</div><input id="shadowOpacity" type="number" step=".02" value=".23"></div><div><div class="meta">柔化</div><input id="shadowSoftness" type="number" step=".01" value=".15"></div></div>
+    </details>
+
+    <details id="cloudSettings">
+      <summary>云端能力配置（只需设置一次）</summary>
+      <div class="integration-grid">
+        <div class="integration-row"><label>MiniMax 密钥</label><input id="minimaxKey" type="password" autocomplete="new-password" placeholder="粘贴密钥；已保存则留空"></div>
+        <div class="integration-row"><label>MiniMax / 中转地址</label><input id="minimaxBase" value="https://api.minimax.io" placeholder="例如 https://minnimax.chat/v1"></div>
+        <div class="integration-row"><label>MiniMax 模型</label><input id="minimaxModel" value="MiniMax-M3"></div>
+        <div class="integration-row"><label>MiniMax 网络路线</label><select id="minimaxNetworkMode"><option value="auto">自动：系统代理失败后同一地址直连</option><option value="system_proxy">只用系统代理</option><option value="direct">只直连当前地址</option></select></div>
+        <div class="integration-row"><label>RunningHub 密钥</label><input id="runninghubKey" type="password" autocomplete="new-password" placeholder="粘贴密钥；已保存则留空"></div>
+        <label class="check"><input id="runninghubEnabled" type="checkbox">优先使用 RunningHub 云抠图，失败自动回退本地</label>
+        <div class="integration-row"><label>服务区域</label><select id="runninghubBase"><option value="https://www.runninghub.cn">中国站 .cn</option><option value="https://www.runninghub.ai">国际站 .ai</option></select></div>
+        <div class="integration-row"><label>任务类型</label><select id="runninghubMode"><option value="ai_app">AI 应用（推荐）</option><option value="comfyui">ComfyUI 工作流</option></select></div>
+        <div class="integration-row"><label>应用/工作流 ID</label><input id="runninghubCutoutId" placeholder="RunningHub 页面链接末尾的数字"></div>
+        <div class="integration-row"><label>图片输入节点</label><input id="runninghubInputNode" placeholder="例如 1"></div>
+        <div class="integration-row"><label>输入字段</label><input id="runninghubInputField" value="image"></div>
+        <div class="integration-row"><label>输出节点</label><input id="runninghubOutputNode" placeholder="可留空，自动取第一个输出"></div>
+        <label class="check"><input id="runninghubHybridEnabled" type="checkbox">启用独立 RunningHub 混合重渲染工作流</label>
+        <div class="integration-row"><label>重渲染任务类型</label><select id="runninghubHybridMode"><option value="ai_app">AI 应用</option><option value="comfyui">ComfyUI 工作流</option></select></div>
+        <div class="integration-row"><label>重渲染应用/流程 ID</label><input id="runninghubHybridAppId" placeholder="不得与抠图流程混用"></div>
+        <div class="integration-row"><label>底图节点</label><input id="runninghubHybridSourceNode" placeholder="输入严格预合成图的节点 ID"></div>
+        <div class="integration-row"><label>底图字段</label><input id="runninghubHybridSourceField" value="image"></div>
+        <div class="integration-row"><label>蒙版节点</label><input id="runninghubHybridMaskNode" placeholder="输入允许重渲染蒙版的节点 ID"></div>
+        <div class="integration-row"><label>蒙版字段</label><input id="runninghubHybridMaskField" value="mask"></div>
+        <div class="integration-row"><label>保护蒙版节点</label><input id="runninghubHybridProtectNode" placeholder="可选：输入文字/轮廓保护蒙版的节点 ID"></div>
+        <div class="integration-row"><label>保护蒙版字段</label><input id="runninghubHybridProtectField" value="mask"></div>
+        <div class="integration-row"><label>提示词节点</label><input id="runninghubHybridPromptNode" placeholder="可选"></div>
+        <div class="integration-row"><label>提示词字段</label><input id="runninghubHybridPromptField" value="prompt"></div>
+        <div class="integration-row"><label>重渲染输出节点</label><input id="runninghubHybridOutputNode" placeholder="必须明确填写"></div>
+      </div>
+      <div class="integration-actions">
+        <button class="primary" onclick="saveCloudSettings()">保存配置</button>
+        <button class="ghost" onclick="testCloud('minimax')">测试 MiniMax</button>
+        <button class="ghost" onclick="testCloud('runninghub')">测试 RunningHub</button>
+      </div>
+      <div class="secret-note">密钥由当前 Windows 用户的 DPAPI 加密保存；页面不会回显明文，也不会写进任务 JSON、图片或项目源码。</div>
+      <div id="cloudState" class="cloud-state">正在读取配置…</div>
+    </details>
+
+    <details>
+      <summary>高级几何（一般无需修改）</summary>
+      <div class="meta">桌面支持面</div><textarea id="supportJson"></textarea>
+      <div class="meta">背景保护区</div><textarea id="protectedJson">[]</textarea>
+    </details>
+
+    <div id="status" class="status">请选择背景和商品图片。</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>实时摆位画布</h2>
+      <div class="badges"><span id="modeBadge" class="badge">等待输入</span><span id="surfaceBadge" class="badge">桌面未识别</span><span id="reflectionBadge" class="badge">倒影未分析</span><span id="advisorBadge" class="badge">MiniMax 未配置</span><span id="runninghubBadge" class="badge">RunningHub 本地兜底</span><span id="learnedEffectsBadge" class="badge">学习阴影未启用</span></div>
+    </div>
+    <div class="workspace">
+      <div id="empty" class="empty"><div><b>先选择一张背景图</b>系统会自动寻找真正可承托商品的桌面区域</div></div>
+      <div id="stage" class="stage" hidden>
+        <img id="backgroundPreview" alt="背景">
+        <div id="overlay" class="overlay"></div>
+      </div>
+    </div>
+    <div id="result"></div>
+  </main>
+</div>
+
+<div id="roiModal" class="roi-modal" hidden>
+  <div class="roi-panel">
+    <div class="roi-head">
+      <div><h3 id="roiTitle">框选需要的商品</h3><p id="roiHint">按住鼠标连续拖一个框，只把完整目标放进框里，四周尽量留一点空隙。书、支架等不要框进去。</p></div>
+      <button class="ghost" onclick="closeRoiSelector()">关闭</button>
+    </div>
+    <div class="roi-workspace">
+      <div id="roiStage" class="roi-stage">
+        <img id="roiImage" alt="商品原图">
+        <div id="roiBox" class="roi-box" hidden></div>
+      </div>
+    </div>
+    <div class="roi-actions">
+      <button class="ghost" onclick="clearRoiSelection()">重新框选</button>
+      <button id="roiConfirm" class="primary" onclick="confirmRoiAndSegment()">使用此框并抠图</button>
+    </div>
+  </div>
+</div>
+
+<div id="imageBrowserModal" class="image-browser-modal" hidden>
+  <div class="image-browser-panel">
+    <div class="roi-head"><div><h3 id="imageBrowserTitle">选择图片</h3><p>这里直接显示图片缩略图；单击图片预览，双击或点“使用选中图片”确认。</p></div><button class="ghost" onclick="closeImageBrowser()">关闭</button></div>
+    <div>
+      <div class="image-browser-bar"><button class="ghost" id="imageBrowserUp" onclick="goImageBrowserParent()">上一级</button><input id="imageBrowserPath" class="image-browser-path" placeholder="输入文件夹路径后按回车"><button class="ghost" onclick="loadImageBrowserFromInput()">打开文件夹</button></div>
+      <div id="imageBrowserRoots" class="image-browser-roots"></div>
+    </div>
+    <div class="image-browser-content"><div id="imageBrowserGrid" class="image-browser-grid"></div><div class="image-browser-preview"><img id="imageBrowserPreview" alt="选中图片预览"><p id="imageBrowserSelection">尚未选择图片</p></div></div>
+    <div class="image-browser-actions"><button class="ghost" onclick="uploadImageFromComputer()">从电脑上传</button><button id="imageBrowserConfirm" class="primary" onclick="confirmImageBrowserSelection()" disabled>使用选中图片</button></div>
+  </div>
+</div>
+
+<script>
+const $ = selector => document.querySelector(selector);
+const products = [1,2,3].map((number,index)=>({
+  id:`product_${number}`,source:"",rgba:"",preview:"",
+  center_x:.25+index*.25,baseline_y:.67,height_ratio:.16,z_order:index+1,
+  placement_mode:"upright",physical_type:"rigid_object",
+  semantic_category:"decor_object",estimated_real_height_cm:20,size_confidence:0,
+  subject_label:"",subject_included_parts:[],subject_locator_confidence:0,
+  subject_semantic_verified:false,
+  estimated_height_cm_min:15,estimated_height_cm_max:30,footprint_width_cm:12,
+  viewpoint_compatibility:.8,source_light_compatibility:.5,
+  visual_salience:.5,material_mode:"opaque",material_confidence:0,transmission_strength:0,
+  receiver_width_or_diameter_cm:100,receiver_size_confidence:0,
+  identity_status:"unknown",identity_mask:null,rerender_policy:"auto",
+  sourceAspect:.72,alphaQuality:null,roi:null,
+  cutoutProvider:"",cloudFallbackReason:"",cutoutModel:""
+}));
+let backgroundInfo=null;
+let scene=null;
+let deepSceneReady=false;
+let deepScenePromise=null;
+let selectedIndex=-1;
+let layoutSnapshot=null;
+let roiProductIndex=-1;
+let roiDraft=null;
+let roiPurpose="cutout";
+let segmentQueue=Promise.resolve();
+let segmentJobs=0;
+let criticalJobs=0;
+let loadedBackgroundPath="";
+let backgroundRevision=0;
+const productRevisions=[0,0,0];
+let lastComposeResult=null;
+let lastVisualReview=null;
+let imageBrowserTarget=null;
+let imageBrowserPath="";
+let imageBrowserParent="";
+let imageBrowserSelected=null;
+let imageBrowserRoots=[];
+let learnedCloudStatus={
+  enabled:false,
+  secret_configured:false,
+  workflow_configured:false,
+  ready:false
+};
+
+function readyForLayout(){
+  return Boolean(backgroundInfo&&scene&&deepSceneReady&&products.every(product=>product.rgba));
+}
+function refreshBusyState(){
+  const busy=criticalJobs>0||segmentJobs>0;
+  document.body.setAttribute("aria-busy",busy?"true":"false");
+  document.querySelectorAll("aside button,aside input,aside textarea,aside select").forEach(control=>{
+    control.disabled=busy;
+  });
+  if(!busy){
+    const ready=readyForLayout();
+    $("#autoLayoutButton").disabled=!ready;
+    $("#repairLayoutButton").disabled=!ready;
+    $("#composeButton").disabled=!ready;
+    applyLearnedInterfaceState();
+  }
+}
+function beginCriticalTask(){criticalJobs+=1;refreshBusyState()}
+function endCriticalTask(){criticalJobs=Math.max(0,criticalJobs-1);refreshBusyState()}
+function setSegmentControlsBusy(){refreshBusyState()}
+
+function invalidateBackgroundState(announce=true){
+  backgroundRevision+=1;
+  loadedBackgroundPath="";
+  backgroundInfo=null;
+  scene=null;
+  deepSceneReady=false;
+  deepScenePromise=null;
+  $("#supportJson").value="";
+  $("#protectedJson").value="[]";
+  $("#backgroundPreview").removeAttribute("src");
+  $("#stage").hidden=true;
+  $("#empty").hidden=false;
+  $("#sceneMeta").textContent="载入后自动识别桌面、保护物和反射属性";
+  $("#sceneQuality").textContent="未分析";
+  $("#sceneQuality").className="quality";
+  $("#surfaceBadge").textContent="桌面未识别";
+  $("#surfaceBadge").className="badge";
+  $("#reflectionBadge").textContent="倒影未分析";
+  $("#reflectionBadge").className="badge";
+  $("#result").innerHTML="";
+  lastComposeResult=null;
+  lastVisualReview=null;
+  refreshBusyState();
+  if(announce)setStatus("背景路径已改变，请重新点击“载入”完成桌面分析。","warn");
+  return backgroundRevision;
+}
+function backgroundPathChanged(value){
+  const next=String(value||"").trim();
+  if(loadedBackgroundPath&&next===loadedBackgroundPath)return;
+  if(!backgroundInfo&&!scene&&!deepSceneReady&&!loadedBackgroundPath){
+    refreshBusyState();
+    return;
+  }
+  invalidateBackgroundState(true);
+}
+
+async function api(path,payload){
+  let response;
+  try{
+    response=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  }catch(error){
+    if(error instanceof TypeError)throw new Error("本地合成服务连接中断。请稍候重试；若持续出现，请刷新页面或重启服务。");
+    throw error;
+  }
+  const raw=await response.text();
+  let data;
+  try{data=JSON.parse(raw)}catch{throw new Error(raw||"服务没有返回可读结果")}
+  if(!response.ok)throw new Error(data.detail||"请求失败");
+  return data;
+}
+async function apiGet(path){
+  const response=await fetch(path);
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.detail||"请求失败");
+  return data;
+}
+function wait(milliseconds){return new Promise(resolve=>window.setTimeout(resolve,milliseconds));}
+function isTransientVisualReviewError(error){
+  const text=String(error?.message||error||"").toLowerCase();
+  return text.includes("视觉评审暂未完成")||text.includes("transport")||
+    text.includes("proxy")||text.includes("network")||text.includes("连接")||
+    text.includes("超时")||text.includes("timeout");
+}
+async function requestVisualReviewWithRecovery(payload){
+  let lastError=null;
+  for(let attempt=1;attempt<=2;attempt++){
+    try{return await api("/api/visual-review",payload)}
+    catch(error){
+      lastError=error;
+      if(attempt>=2||!isTransientVisualReviewError(error))throw error;
+      setStatus(`MiniMax 视觉评审网络重连中（${attempt}/2）：仅补未完成评审槽位，不会重抽已得到的分数…`,"busy");
+      await wait(900);
+    }
+  }
+  throw lastError||new Error("视觉评审暂未完成");
+}
+function integrationPayload(){
+  return {
+    minimax_api_key:$("#minimaxKey").value.trim(),
+    minimax_model:$("#minimaxModel").value.trim()||"MiniMax-M3",
+    minimax_base_url:$("#minimaxBase").value,
+    minimax_network_mode:$("#minimaxNetworkMode").value,
+    runninghub_api_key:$("#runninghubKey").value.trim(),
+    runninghub_base_url:$("#runninghubBase").value,
+    runninghub_enabled:$("#runninghubEnabled").checked,
+    runninghub_mode:$("#runninghubMode").value,
+    runninghub_cutout_id:$("#runninghubCutoutId").value.trim(),
+    runninghub_input_node_id:$("#runninghubInputNode").value.trim(),
+    runninghub_input_field_name:$("#runninghubInputField").value.trim()||"image",
+    runninghub_output_node_id:$("#runninghubOutputNode").value.trim(),
+    runninghub_hybrid_enabled:$("#runninghubHybridEnabled").checked,
+    runninghub_hybrid_mode:$("#runninghubHybridMode").value,
+    runninghub_hybrid_app_id:$("#runninghubHybridAppId").value.trim(),
+    runninghub_hybrid_source_node_id:$("#runninghubHybridSourceNode").value.trim(),
+    runninghub_hybrid_source_field_name:$("#runninghubHybridSourceField").value.trim()||"image",
+    runninghub_hybrid_mask_node_id:$("#runninghubHybridMaskNode").value.trim(),
+    runninghub_hybrid_mask_field_name:$("#runninghubHybridMaskField").value.trim()||"mask",
+    runninghub_hybrid_protect_node_id:$("#runninghubHybridProtectNode").value.trim(),
+    runninghub_hybrid_protect_field_name:$("#runninghubHybridProtectField").value.trim()||"mask",
+    runninghub_hybrid_prompt_node_id:$("#runninghubHybridPromptNode").value.trim(),
+    runninghub_hybrid_prompt_field_name:$("#runninghubHybridPromptField").value.trim()||"prompt",
+    runninghub_hybrid_output_node_id:$("#runninghubHybridOutputNode").value.trim(),
+    runninghub_learned_enabled:$("#runninghubLearnedEnabled").checked,
+    runninghub_learned_mode:$("#runninghubLearnedMode").value,
+    runninghub_learned_app_id:$("#runninghubLearnedAppId").value.trim(),
+    runninghub_learned_source_node_id:$("#runninghubLearnedSourceNode").value.trim(),
+    runninghub_learned_source_field_name:$("#runninghubLearnedSourceField").value.trim()||"image",
+    runninghub_learned_product_mask_node_id:$("#runninghubLearnedProductMaskNode").value.trim(),
+    runninghub_learned_product_mask_field_name:$("#runninghubLearnedProductMaskField").value.trim()||"image",
+    runninghub_learned_geometry_node_id:$("#runninghubLearnedGeometryNode").value.trim(),
+    runninghub_learned_geometry_field_name:$("#runninghubLearnedGeometryField").value.trim()||"image",
+    runninghub_learned_normal_node_id:$("#runninghubLearnedNormalNode").value.trim(),
+    runninghub_learned_normal_field_name:$("#runninghubLearnedNormalField").value.trim()||"image",
+    runninghub_learned_background_node_id:$("#runninghubLearnedBackgroundNode").value.trim(),
+    runninghub_learned_background_field_name:$("#runninghubLearnedBackgroundField").value.trim()||"image",
+    runninghub_learned_prompt_node_id:$("#runninghubLearnedPromptNode").value.trim(),
+    runninghub_learned_prompt_field_name:$("#runninghubLearnedPromptField").value.trim()||"prompt",
+    runninghub_learned_shadow_output_node_id:$("#runninghubLearnedShadowOutputNode").value.trim(),
+    runninghub_learned_shadow_encoding:$("#runninghubLearnedShadowEncoding").value
+  };
+}
+function learnedIntegrationStatus(settings){
+  const remote=settings.runninghub_learned_status;
+  if(remote&&typeof remote==="object"){
+    return {
+      enabled:Boolean(remote.enabled),
+      secret_configured:Boolean(remote.secret_configured),
+      workflow_configured:Boolean(remote.workflow_configured),
+      ready:Boolean(remote.ready)
+    };
+  }
+  const required=[
+    settings.runninghub_learned_app_id,
+    settings.runninghub_learned_source_node_id,
+    settings.runninghub_learned_product_mask_node_id,
+    settings.runninghub_learned_geometry_node_id,
+    settings.runninghub_learned_normal_node_id,
+    settings.runninghub_learned_prompt_node_id,
+    settings.runninghub_learned_shadow_output_node_id
+  ];
+  const enabled=Boolean(settings.runninghub_learned_enabled);
+  const secretConfigured=Boolean(settings.runninghub_configured);
+  const workflowConfigured=Boolean(
+    required.every(value=>String(value||"").trim())&&
+    ["ai_app","comfyui"].includes(String(settings.runninghub_learned_mode||""))&&
+    ["white_is_shadow","black_is_shadow"].includes(String(settings.runninghub_learned_shadow_encoding||""))&&
+    !String(settings.runninghub_learned_gain_output_node_id||"").trim()&&
+    !String(settings.runninghub_learned_specular_output_node_id||"").trim()
+  );
+  return {
+    enabled,
+    secret_configured:secretConfigured,
+    workflow_configured:workflowConfigured,
+    ready:enabled&&secretConfigured&&workflowConfigured
+  };
+}
+function applyLearnedInterfaceState(){
+  const busy=criticalJobs>0||segmentJobs>0;
+  const composeToggle=$("#learnedEffectsEnabled");
+  if(composeToggle){
+    if(!learnedCloudStatus.ready)composeToggle.checked=false;
+    composeToggle.disabled=busy||!learnedCloudStatus.ready;
+    composeToggle.title=learnedCloudStatus.ready
+      ?"V1 工作流已就绪；勾选后仅对本次合成启用学习阴影"
+      :"请先完成并测试学习阴影 V1 云端配置";
+  }
+  ["#runninghubLearnedGainOutputNode","#runninghubLearnedSpecularOutputNode"].forEach(selector=>{
+    const field=$(selector);
+    if(field){
+      field.value="";
+      field.disabled=true;
+      field.setAttribute("aria-disabled","true");
+    }
+  });
+}
+function showIntegrationState(settings){
+  const minimax=settings.minimax_configured?"MiniMax 密钥已加密保存":"MiniMax 未配置";
+  const runninghub=settings.runninghub_configured
+    ?(settings.runninghub_cutout_id?"RunningHub 密钥和流程已配置":"RunningHub 已有密钥，仍需填写应用/工作流 ID")
+    :"RunningHub 未配置";
+  learnedCloudStatus=learnedIntegrationStatus(settings);
+  const learnedState=`学习阴影 V1：ready=${learnedCloudStatus.ready} · secret_configured=${learnedCloudStatus.secret_configured} · workflow_configured=${learnedCloudStatus.workflow_configured}`;
+  $("#cloudState").textContent=`${minimax}；${runninghub}；${learnedState}。`;
+  const learnedDetails=$("#learnedCloudState");
+  if(learnedDetails){
+    learnedDetails.textContent=`${learnedState} · 配置总开关=${learnedCloudStatus.enabled?"开启":"关闭"}。保存配置不会自动用于合成，每次仍需单独勾选“本次合成启用学习阴影 V1”。`;
+    learnedDetails.className=`cloud-state ${learnedCloudStatus.ready?"good":""}`;
+  }
+  $("#advisorBadge").textContent=settings.minimax_configured?"MiniMax 已配置":"MiniMax 未配置";
+  $("#advisorBadge").className=`badge ${settings.minimax_configured?"good":""}`;
+  const ready=settings.runninghub_configured&&settings.runninghub_enabled&&settings.runninghub_cutout_id&&settings.runninghub_input_node_id;
+  $("#runninghubBadge").textContent=ready?"RunningHub 云抠图优先":"RunningHub 本地兜底";
+  $("#runninghubBadge").className=`badge ${ready?"good":""}`;
+  $("#learnedEffectsBadge").textContent=learnedCloudStatus.ready
+    ?"学习阴影 V1 已就绪"
+    :(learnedCloudStatus.enabled?"学习阴影 V1 待配置":"学习阴影未启用");
+  $("#learnedEffectsBadge").className=`badge ${learnedCloudStatus.ready?"good":(learnedCloudStatus.enabled?"manual":"")}`;
+  applyLearnedInterfaceState();
+}
+async function loadCloudSettings(){
+  try{
+    const settings=await apiGet("/api/integrations");
+    const cloudPanel=$("#cloudSettings");
+    document.querySelector("aside .section").before(cloudPanel);
+    const learnedStatus=learnedIntegrationStatus(settings);
+    cloudPanel.open=!(settings.minimax_configured&&settings.runninghub_configured)||
+      (learnedStatus.enabled&&!learnedStatus.ready);
+    $("#minimaxBase").value=settings.minimax_base_url||"https://api.minimax.io";
+    $("#minimaxModel").value=settings.minimax_model||"MiniMax-M3";
+    $("#minimaxNetworkMode").value=settings.minimax_network_mode||"auto";
+    $("#runninghubEnabled").checked=Boolean(settings.runninghub_enabled);
+    $("#runninghubBase").value=settings.runninghub_base_url||"https://www.runninghub.cn";
+    $("#runninghubMode").value=settings.runninghub_mode||"ai_app";
+    $("#runninghubCutoutId").value=settings.runninghub_cutout_id||"";
+    $("#runninghubInputNode").value=settings.runninghub_input_node_id||"";
+    $("#runninghubInputField").value=settings.runninghub_input_field_name||"image";
+    $("#runninghubOutputNode").value=settings.runninghub_output_node_id||"";
+    $("#runninghubHybridEnabled").checked=Boolean(settings.runninghub_hybrid_enabled);
+    $("#runninghubHybridMode").value=settings.runninghub_hybrid_mode||"ai_app";
+    $("#runninghubHybridAppId").value=settings.runninghub_hybrid_app_id||"";
+    $("#runninghubHybridSourceNode").value=settings.runninghub_hybrid_source_node_id||"";
+    $("#runninghubHybridSourceField").value=settings.runninghub_hybrid_source_field_name||"image";
+    $("#runninghubHybridMaskNode").value=settings.runninghub_hybrid_mask_node_id||"";
+    $("#runninghubHybridMaskField").value=settings.runninghub_hybrid_mask_field_name||"mask";
+    $("#runninghubHybridProtectNode").value=settings.runninghub_hybrid_protect_node_id||"";
+    $("#runninghubHybridProtectField").value=settings.runninghub_hybrid_protect_field_name||"mask";
+    $("#runninghubHybridPromptNode").value=settings.runninghub_hybrid_prompt_node_id||"";
+    $("#runninghubHybridPromptField").value=settings.runninghub_hybrid_prompt_field_name||"prompt";
+    $("#runninghubHybridOutputNode").value=settings.runninghub_hybrid_output_node_id||"";
+    $("#runninghubLearnedEnabled").checked=Boolean(settings.runninghub_learned_enabled);
+    $("#runninghubLearnedMode").value=settings.runninghub_learned_mode||"comfyui";
+    $("#runninghubLearnedAppId").value=settings.runninghub_learned_app_id||"";
+    $("#runninghubLearnedSourceNode").value=settings.runninghub_learned_source_node_id||"";
+    $("#runninghubLearnedSourceField").value=settings.runninghub_learned_source_field_name||"image";
+    $("#runninghubLearnedProductMaskNode").value=settings.runninghub_learned_product_mask_node_id||"";
+    $("#runninghubLearnedProductMaskField").value=settings.runninghub_learned_product_mask_field_name||"image";
+    $("#runninghubLearnedGeometryNode").value=settings.runninghub_learned_geometry_node_id||"";
+    $("#runninghubLearnedGeometryField").value=settings.runninghub_learned_geometry_field_name||"image";
+    $("#runninghubLearnedNormalNode").value=settings.runninghub_learned_normal_node_id||"";
+    $("#runninghubLearnedNormalField").value=settings.runninghub_learned_normal_field_name||"image";
+    $("#runninghubLearnedBackgroundNode").value=settings.runninghub_learned_background_node_id||"";
+    $("#runninghubLearnedBackgroundField").value=settings.runninghub_learned_background_field_name||"image";
+    $("#runninghubLearnedPromptNode").value=settings.runninghub_learned_prompt_node_id||"";
+    $("#runninghubLearnedPromptField").value=settings.runninghub_learned_prompt_field_name||"prompt";
+    $("#runninghubLearnedShadowOutputNode").value=settings.runninghub_learned_shadow_output_node_id||"";
+    $("#runninghubLearnedGainOutputNode").value="";
+    $("#runninghubLearnedSpecularOutputNode").value="";
+    $("#runninghubLearnedShadowEncoding").value=settings.runninghub_learned_shadow_encoding||"white_is_shadow";
+    const automaticHybridReady=Boolean(
+      settings.runninghub_configured&&settings.runninghub_hybrid_enabled&&
+      settings.runninghub_hybrid_app_id
+    );
+    if(automaticHybridReady&&!$("#hybridCandidate").value.trim()){
+      $("#hybridRerenderEnabled").checked=true;
+      $("#hybridProvider").value="runninghub";
+    }
+    const hybridLabel=$("#hybridRerenderEnabled").closest("label");
+    if(hybridLabel&&hybridLabel.lastChild){
+      hybridLabel.lastChild.textContent="透明/反光材质局部重渲染（推荐，文字自动保护）";
+    }
+    showIntegrationState(settings);
+  }catch(error){$("#cloudState").textContent=`配置读取失败：${error.message}`}
+}
+async function saveCloudSettings(silent=false){
+  try{
+    const settings=await api("/api/integrations",integrationPayload());
+    $("#minimaxKey").value="";$("#runninghubKey").value="";
+    showIntegrationState(settings);
+    if(
+      settings.runninghub_configured&&settings.runninghub_hybrid_enabled&&
+      settings.runninghub_hybrid_app_id&&!$("#hybridCandidate").value.trim()
+    ){
+      $("#hybridRerenderEnabled").checked=true;
+      $("#hybridProvider").value="runninghub";
+    }
+    if(!silent)setStatus("云端配置已安全保存。密钥不会显示在页面或进入工作流 JSON。","ok");
+    return settings;
+  }catch(error){setStatus(error.message,"warn");throw error}
+}
+async function testCloud(provider){
+  const providerLabel=provider==="minimax"
+    ?"MiniMax"
+    :(provider==="runninghub_learned"?"RunningHub 学习阴影 V1":"RunningHub 抠图");
+  beginCriticalTask();
+  try{
+    await saveCloudSettings(true);
+    setStatus(`正在测试 ${providerLabel} 连接…`,"busy");
+    const result=await api("/api/integrations/test",{provider});
+    if(provider==="minimax"&&result.base_url){
+      $("#minimaxBase").value=result.base_url;
+      await saveCloudSettings(true);
+    }
+    if(provider==="runninghub"&&result.suggested_input){
+      if(result.base_url)$("#runninghubBase").value=result.base_url;
+      $("#runninghubInputNode").value=result.suggested_input.nodeId||"";
+      $("#runninghubInputField").value=result.suggested_input.fieldName||"image";
+      await saveCloudSettings(true);
+    }
+    if(provider==="runninghub_learned"&&result.base_url){
+      $("#runninghubBase").value=result.base_url;
+    }
+    if(result.usable===false){
+      setStatus(result.message||`${providerLabel} 密钥有效，但当前账户暂时无法执行请求。`,"warn");
+      return;
+    }
+    const correction=result.region_auto_corrected?"，已自动切换到密钥所属区域":"";
+    let providerMessage="";
+    if(provider==="runninghub"){
+      providerMessage=`RunningHub 抠图密钥、上传权限和工作流读取通过${correction}${result.node_count!==undefined?`，识别到 ${result.node_count} 个可配置节点`:""}；真实云任务会在首次抠图时验证，算力不足会明确提示并自动回退本地。`;
+    }else if(provider==="runninghub_learned"){
+      providerMessage=`RunningHub 学习阴影 V1 密钥、上传权限和专用工作流读取通过${correction}${result.node_count!==undefined?`，识别到 ${result.node_count} 个可配置节点`:""}。本次只验证配置，没有创建生成任务；要用于图片仍需单独勾选“本次合成启用学习阴影 V1”。`;
+      await loadCloudSettings();
+    }else{
+      providerMessage=`MiniMax 连接成功${correction}。`;
+    }
+    setStatus(providerMessage,"ok");
+  }catch(error){setStatus(`${providerLabel} 测试失败：${error.message}`,"warn")}
+  finally{endCriticalTask()}
+}
+function setStatus(message,type=""){
+  $("#status").className=`status ${type}`;
+  $("#status").innerHTML=type==="busy"?`<span class="spinner"></span>${message}`:message;
+}
+function setMode(text,manual=false){
+  $("#modeBadge").textContent=text;
+  $("#modeBadge").className=`badge ${manual?"manual":"good"}`;
+}
+function syncAdvanced(){
+  if(scene){
+    $("#supportJson").value=JSON.stringify(scene.support_polygon);
+    $("#protectedJson").value=JSON.stringify(scene.protected_polygons||[]);
+  }
+}
+function readGeometry(){
+  return {
+    support_polygon:JSON.parse($("#supportJson").value||"[]"),
+    protected_polygons:JSON.parse($("#protectedJson").value||"[]")
+  };
+}
+function productPayload(){return products.map(({preview,sourceAspect,alphaQuality,roi,...item})=>item)}
+function sceneGeometryEvidence(){
+  const evidence={};
+  if(scene?.depth_map_path)evidence.depth_map_path=scene.depth_map_path;
+  if(scene?.normal_map_path)evidence.normal_map_path=scene.normal_map_path;
+  return evidence;
+}
+
+const materialOptions=[
+  ["opaque","不透明（默认）"],["opaque_matte","哑光不透明"],
+  ["opaque_glossy","高光陶瓷/塑料"],["metal","金属"],
+  ["wood_paper_fabric","木材/纸/织物"],["clear_glass","透明玻璃"],
+  ["frosted_glass","磨砂玻璃"],["colored_glass","有色玻璃"],
+  ["mixed_transparent","标签/玻璃混合"]
+];
+const identityOptions=[
+  ["unknown","未知（保守）"],["confirmed_absent","确认无文字/Logo"],
+  ["detected","已框选文字/Logo"],["unavailable","无法判断"],["failed","检测失败"]
+];
+const rerenderOptions=[
+  ["auto","自动安全路由"],["never","始终严格合成"],
+  ["transparent_optical","仅透明光学区"],["regional","已框选身份区，重渲染其余材质"]
+];
+function optionList(options,value){
+  return options.map(([key,label])=>`<option value="${key}" ${key===value?"selected":""}>${label}</option>`).join("");
+}
+function isTransmissiveMaterial(value){
+  return ["clear_glass","frosted_glass","colored_glass","mixed_transparent"].includes(value);
+}
+function setMaterial(index,value){
+  products[index].material_mode=value;
+  if(!isTransmissiveMaterial(value)&&products[index].rerender_policy!=="never")products[index].rerender_policy="never";
+  renderCards();draw();
+}
+function setIdentityStatus(index,value){
+  products[index].identity_status=value;
+  if(value!=="detected")products[index].identity_mask=null;
+  renderCards();draw();
+}
+function setRerenderPolicy(index,value){
+  products[index].rerender_policy=value;
+  renderCards();draw();
+}
+
+function renderCards(){
+  $("#productCards").innerHTML=products.map((product,index)=>{
+    const quality=product.alphaQuality;
+    // This score is structural mask confidence, never a claim that the
+    // cutout is visually production-ready.  Naming it plainly prevents a
+    // clean-but-wrong mask from being mistaken for a 100-point final result.
+    const label=quality
+      ?(quality.verdict==="pass"
+        ?`自动蒙版检查 ${Math.round(quality.score)}`
+        :`蒙版需复核 ${Math.round(quality.score)}`)
+      :"未抠图";
+    const cls=quality?quality.verdict:"";
+    const selection=product.roi?"已框选目标；再次点击可重选":"画面有多个物体时，先框住你要的那个";
+    const providerLabel=product.cutoutProvider==="runninghub"
+      ?"抠图来源：RunningHub Alpha + 原图 RGB"
+      :(product.cutoutProvider==="direct_rgba"
+        ?"抠图来源：用户 RGBA"
+        :(product.cutoutProvider==="local"?"抠图来源：本地严格兜底":""));
+    const providerDetail=product.cloudFallbackReason
+      ?`${providerLabel}；云端未采用：${product.cloudFallbackReason}`
+      :providerLabel;
+    return `<div class="card">
+      <div class="product-head"><b>商品 ${index+1}</b><span class="quality ${cls}">${label}</span></div>
+      <div class="row"><input id="source${index}" class="grow" value="${escapeHtml(product.source)}" onchange="sourceChanged(${index},this.value)" placeholder="商品图片"><button onclick="browseProduct(${index})">浏览</button></div>
+      <div class="product-controls"><button class="ghost" onclick="segmentWhole(${index})">直接抠图</button><button class="primary" onclick="openRoiSelector(${index})">框选后抠图</button><button class="ghost" onclick="useRgba(${index})">RGBA</button></div>
+      <div class="selection-note ${product.roi?"active":""}">${selection}</div>
+      ${providerDetail?`<div class="selection-note active">${escapeHtml(providerDetail)}</div>`:""}
+      <div class="size-row"><label>画面高度</label><input type="number" min=".035" max=".65" step=".01" value="${product.height_ratio.toFixed(3)}" onchange="setHeight(${index},this.value)"></div>
+      <details><summary>材质与局部重渲染</summary>
+        <div class="size-row"><label>材质</label><select onchange="setMaterial(${index},this.value)">${optionList(materialOptions,product.material_mode)}</select></div>
+        <div class="size-row"><label>身份状态</label><select onchange="setIdentityStatus(${index},this.value)">${optionList(identityOptions,product.identity_status)}</select></div>
+        <div class="size-row"><label>重渲染策略</label><select onchange="setRerenderPolicy(${index},this.value)">${optionList(rerenderOptions,product.rerender_policy)}</select></div>
+        <div class="product-controls"><button class="ghost" ${product.rgba?"":"disabled"} onclick="openIdentitySelector(${index})">框选文字 / Logo</button></div>
+        <div class="selection-note ${product.identity_mask?"active":""}">${product.identity_mask?"身份保护蒙版已生成：候选图不能改动该区域。":"未指定身份蒙版：含文字商品会自动走严格合成。"}</div>
+      </details>
+      <div class="file-line">${escapeHtml(product.rgba||"尚未生成透明图")}</div>
+    </div>`;
+  }).join("");
+  refreshBusyState();
+}
+function escapeHtml(value){return String(value||"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
+
+async function chooseFile(title){
+  const file=await new Promise((resolve,reject)=>{
+    const picker=document.createElement("input");
+    picker.type="file";
+    picker.accept=".png,.jpg,.jpeg,.webp,.tif,.tiff,image/png,image/jpeg,image/webp,image/tiff";
+    picker.style.position="fixed";
+    picker.style.left="-10000px";
+    picker.setAttribute("aria-label",title);
+    document.body.appendChild(picker);
+    let settled=false;
+    const finish=value=>{
+      if(settled)return;
+      settled=true;
+      window.removeEventListener("focus",checkCancel);
+      picker.remove();
+      resolve(value);
+    };
+    const checkCancel=()=>setTimeout(()=>{if(!picker.files?.length)finish(null)},300);
+    picker.addEventListener("change",()=>finish(picker.files?.[0]||null),{once:true});
+    window.addEventListener("focus",checkCancel,{once:true});
+    picker.click();
+  });
+  if(!file)return "";
+  setStatus(`正在载入 ${file.name}…`,"busy");
+  const response=await fetch(`/api/upload-image?filename=${encodeURIComponent(file.name)}`,{
+    method:"POST",
+    headers:{"Content-Type":file.type||"application/octet-stream"},
+    body:file
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.detail||`图片载入失败（${response.status}）`);
+  return data.path;
+}
+function closeImageBrowser(){
+  $("#imageBrowserModal").hidden=true;
+  imageBrowserTarget=null;imageBrowserSelected=null;
+}
+function renderImageBrowser(data){
+  imageBrowserPath=data.path||"";imageBrowserParent=data.parent||"";
+  imageBrowserRoots=data.roots||imageBrowserRoots;
+  $("#imageBrowserPath").value=imageBrowserPath;
+  $("#imageBrowserUp").disabled=!imageBrowserParent;
+  $("#imageBrowserRoots").innerHTML=imageBrowserRoots.map(root=>`<button class="ghost" onclick="loadImageBrowser(decodeURIComponent('${encodeURIComponent(root)}'))">${escapeHtml(root)}</button>`).join("");
+  const grid=$("#imageBrowserGrid");
+  grid.innerHTML=(data.entries||[]).map((entry,index)=>entry.kind==="folder"
+    ?`<button class="image-browser-item" title="${escapeHtml(entry.path)}" onclick="loadImageBrowser(decodeURIComponent('${encodeURIComponent(entry.path)}'))"><div class="folder-icon">DIR</div><span>${escapeHtml(entry.name)}</span></button>`
+    :`<button class="image-browser-item ${imageBrowserSelected?.path===entry.path?"selected":""}" title="${escapeHtml(entry.path)}" onclick="selectImageBrowserFile(${index})" ondblclick="selectImageBrowserFile(${index},true)"><img loading="lazy" src="${entry.preview}" alt="${escapeHtml(entry.name)}"><span>${escapeHtml(entry.name)}</span></button>`).join("") || '<div class="hint">此文件夹内没有可用图片。</div>';
+  window.imageBrowserEntries=data.entries||[];
+  if(data.truncated)grid.insertAdjacentHTML("afterbegin",'<div class="hint">文件太多，只显示前 500 项；请进入更具体的文件夹。</div>');
+}
+async function loadImageBrowser(path){
+  try{
+    imageBrowserSelected=null;
+    $("#imageBrowserConfirm").disabled=true;
+    $("#imageBrowserSelection").textContent="正在读取文件夹…";
+    const data=await api("/api/image-browser",{path:path||imageBrowserPath});
+    renderImageBrowser(data);
+    $("#imageBrowserPreview").removeAttribute("src");
+    $("#imageBrowserSelection").textContent="单击一张图片查看大预览。";
+  }catch(error){setStatus(error.message,"warn")}
+}
+function loadImageBrowserFromInput(){loadImageBrowser($("#imageBrowserPath").value.trim())}
+function goImageBrowserParent(){if(imageBrowserParent)loadImageBrowser(imageBrowserParent)}
+function selectImageBrowserFile(index,confirm=false){
+  const entry=(window.imageBrowserEntries||[])[index];
+  if(!entry||entry.kind!=="image")return;
+  imageBrowserSelected=entry;
+  $("#imageBrowserPreview").src=entry.preview;
+  $("#imageBrowserSelection").textContent=entry.path;
+  $("#imageBrowserConfirm").disabled=false;
+  renderImageBrowser({path:imageBrowserPath,parent:imageBrowserParent,roots:imageBrowserRoots,entries:window.imageBrowserEntries});
+  if(confirm)confirmImageBrowserSelection();
+}
+async function openImageBrowser(target){
+  imageBrowserTarget=target;imageBrowserSelected=null;
+  $("#imageBrowserTitle").textContent=target.kind==="background"?"选择背景图":target.kind==="hybrid_candidate"?"选择生成候选图":"选择商品图";
+  $("#imageBrowserSelection").textContent="正在读取文件夹…";
+  $("#imageBrowserPreview").removeAttribute("src");
+  $("#imageBrowserConfirm").disabled=true;
+  $("#imageBrowserModal").hidden=false;
+  await loadImageBrowser(target.initialPath||imageBrowserPath||"");
+}
+async function confirmImageBrowserSelection(){
+  const target=imageBrowserTarget,selected=imageBrowserSelected;
+  if(!target||!selected)return;
+  closeImageBrowser();
+  if(target.kind==="background"){
+    $("#background").value=selected.path;
+    await loadBackground();
+    return;
+  }
+  if(target.kind==="hybrid_candidate"){
+    $("#hybridCandidate").value=selected.path;
+    $("#hybridRerenderEnabled").checked=true;
+    setStatus(`已选择混合重渲染候选图：${selected.name}。系统只会使用身份保护蒙版内授权的像素。`,"ok");
+    return;
+  }
+  const index=target.index;
+  productRevisions[index]+=1;
+  Object.assign(products[index],{source:selected.path,rgba:"",preview:"",alphaQuality:null,roi:null,cutoutProvider:"",cloudFallbackReason:"",cutoutModel:"",material_mode:"opaque",material_confidence:0,transmission_strength:0,identity_status:"unknown",identity_mask:null,rerender_policy:"auto",estimated_real_height_cm:20,estimated_height_cm_min:15,estimated_height_cm_max:30,footprint_width_cm:12,size_confidence:0,viewpoint_compatibility:.8,source_light_compatibility:.5,subject_label:"",subject_included_parts:[],subject_locator_confidence:0,subject_semantic_verified:false});
+  renderCards();draw();
+  setStatus(`已选择商品 ${index+1}：${selected.name}。下一步点击“直接抠图”或“框选后抠图”。`,"ok");
+}
+async function uploadImageFromComputer(){
+  const target=imageBrowserTarget;
+  if(!target)return;
+  try{
+    const path=await chooseFile(target.kind==="background"?"选择背景图":"选择商品图");
+    if(!path)return;
+    imageBrowserSelected={path,name:path.split(/[\\/]/).pop(),preview:`/api/file?path=${path.replaceAll("\\","/")}`};
+    await confirmImageBrowserSelection();
+  }catch(error){setStatus(error.message,"warn")}
+}
+async function browseBackground(){
+  await openImageBrowser({kind:"background",initialPath:$("#background").value.trim()});
+}
+async function browseProduct(index){
+  await openImageBrowser({kind:"product",index,initialPath:products[index].source||""});
+}
+async function browseHybridCandidate(){
+  await openImageBrowser({kind:"hybrid_candidate",initialPath:$("#hybridCandidate").value.trim()});
+}
+function assignProductSourceState(index,value){
+  const source=String(value||"").trim();
+  if(source===products[index].source)return false;
+  productRevisions[index]+=1;
+  Object.assign(products[index],{
+    source,rgba:"",preview:"",alphaQuality:null,roi:null,
+    cutoutProvider:"",cloudFallbackReason:"",cutoutModel:"",
+    material_mode:"opaque",material_confidence:0,transmission_strength:0,
+    identity_status:"unknown",identity_mask:null,rerender_policy:"auto",
+    estimated_real_height_cm:20,estimated_height_cm_min:15,
+    estimated_height_cm_max:30,footprint_width_cm:12,size_confidence:0,
+    viewpoint_compatibility:.8,source_light_compatibility:.5,
+    subject_label:"",subject_included_parts:[],subject_locator_confidence:0,
+    subject_semantic_verified:false
+  });
+  return true;
+}
+function syncVisibleProductSources(){
+  // A cutout completion re-renders every product card.  Commit all currently
+  // visible text fields before starting any single-product request, otherwise
+  // untouched fields can be restored from the previous dataset when the first
+  // response arrives.  This is important for both pasted paths and automated
+  // browser use; it also makes the three individual buttons match prepareAll.
+  const requestedSources=products.map((product,index)=>{
+    const field=$(`#source${index}`);
+    return field?field.value.trim():product.source;
+  });
+  requestedSources.forEach((source,index)=>{
+    assignProductSourceState(index,source);
+  });
+  return requestedSources;
+}
+function sourceChanged(index,value){
+  if(!assignProductSourceState(index,value))return;
+  renderCards();draw();
+}
+async function loadBackground(){
+  const path=$("#background").value.trim();
+  if(!path)throw new Error("请选择背景图片");
+  beginCriticalTask();
+  const requestRevision=invalidateBackgroundState(false);
+  try{
+    setStatus("正在载入背景…","busy");
+    const info=await api("/api/info",{path});
+    if(requestRevision!==backgroundRevision||$("#background").value.trim()!==path)return false;
+    backgroundInfo=info;
+    loadedBackgroundPath=path;
+    $("#backgroundPreview").src=backgroundInfo.preview;
+    $("#stage").hidden=false;$("#empty").hidden=true;
+    await new Promise((resolve,reject)=>{
+      const image=$("#backgroundPreview");
+      image.onload=resolve;
+      image.onerror=()=>reject(new Error("背景预览载入失败"));
+      if(image.complete&&image.naturalWidth)resolve();
+    });
+    if(requestRevision!==backgroundRevision||$("#background").value.trim()!==path)return false;
+    $("#sceneMeta").textContent=`${backgroundInfo.width} × ${backgroundInfo.height}`;
+    draw();
+    // The colour-only preview is an optional responsiveness hint, never a
+    // prerequisite for the semantic/depth/MiniMax receiver analysis.  Dark,
+    // glossy or strongly perspective tables can legitimately defeat the
+    // classical preview even though the physical tabletop is obvious.  The
+    // old early return prevented the stronger analyser from ever running.
+    try{
+      await analyzeScene(false,requestRevision,path);
+    }catch(previewError){
+      if(requestRevision!==backgroundRevision||$("#background").value.trim()!==path)return false;
+      setStatus(`快速桌面预览证据不足，正在转入精确语义/深度分析：${previewError.message}`,"busy");
+    }
+    // Preview pixels are already visible, so product selection can start while
+    // the cloud-assisted analysis continues.  Compose/layout remain protected
+    // by deepSceneReady.
+    deepScenePromise=analyzeScene(true,requestRevision,path).catch(error=>{
+      if(requestRevision===backgroundRevision){
+        setStatus(`精确语义分析暂时失败：${error.message}。可稍后点击“载入”重试。`,"warn");
+      }
+      return false;
+    });
+    setStatus("背景和桌面预览已就绪，可以立即继续选择三件商品；精确几何与 MiniMax 复核正在后台运行。","ok");
+    return true;
+  }finally{
+    endCriticalTask();
+  }
+}
+async function analyzeScene(deep=true,requestRevision=backgroundRevision,path=$("#background").value.trim()){
+  if(!backgroundInfo)return;
+  setStatus(deep?"正在进行语义桌面分析；首次加载模型可能需要约一分钟…":"正在快速定位桌面…","busy");
+  const analysis=await api("/api/analyze-scene",{background:path,deep});
+  if(requestRevision!==backgroundRevision||$("#background").value.trim()!==path)return false;
+  scene=analysis;syncAdvanced();
+  if(deep)deepSceneReady=true;
+    if(deep&&analysis.shadow_direction){
+    $("#shadowX").value=Number(analysis.shadow_direction[0]).toFixed(3);
+    $("#shadowY").value=Number(analysis.shadow_direction[1]).toFixed(3);
+    $("#shadowLength").value=Number(analysis.shadow_length_ratio).toFixed(3);
+    $("#shadowOpacity").value=Number(analysis.shadow_opacity).toFixed(3);
+      $("#shadowSoftness").value=Number(analysis.shadow_softness_ratio).toFixed(3);
+      const reflectionStrength=analysis.surface_material==="transparent_glass"
+        ?Math.min(.38,Math.max(.24,.20+Number(analysis.reflectivity||0)*.20))
+        // The scene analyser reports physical reflectivity, while this control
+        // is the final catalogue-presentation strength after material gain,
+        // distance falloff and preview downsampling.  The old .025 + r*.18
+        // mapping made a confirmed polished receiver (r ~= .40) land below
+        // .10; small product reflections then vanished at normal viewing size.
+        // Keep matte/non-recommended receivers off through reflectionMode,
+        // but give a confirmed reflective opaque surface a bounded visible cue.
+        :Math.min(.30,Math.max(.08,.055+Number(analysis.reflectivity||0)*.28));
+      $("#reflectionOpacity").value=reflectionStrength.toFixed(3);
+    }
+  $("#sceneQuality").textContent=`${Math.round(analysis.confidence*100)}%`;
+  $("#sceneQuality").className=`quality ${analysis.confidence>=.45?"pass":"review"}`;
+  $("#surfaceBadge").textContent=analysis.method.includes("semantic")?"语义+深度桌面已锁定":"快速桌面已锁定";
+  $("#surfaceBadge").className="badge good";
+  $("#reflectionBadge").textContent=analysis.reflection_recommended?`建议倒影 ${Math.round(analysis.reflectivity*100)}%`:`建议关闭倒影 ${Math.round(analysis.reflectivity*100)}%`;
+  $("#reflectionBadge").className="badge";
+  const advisor=analysis.advisor||{};
+  if(advisor.status==="used"){
+    $("#advisorBadge").textContent=`MiniMax 已校验 ${Math.round((advisor.confidence||0)*100)}%`;
+    $("#advisorBadge").className="badge good";
+  }else if(advisor.status==="fallback_local"){
+    $("#advisorBadge").textContent="MiniMax 异常，已本地回退";
+    $("#advisorBadge").className="badge manual";
+  }else if(advisor.status==="reject_recommended"){
+    $("#advisorBadge").textContent="MiniMax 建议拒绝";
+    $("#advisorBadge").className="badge manual";
+  }else{
+    $("#advisorBadge").textContent="MiniMax 未配置";
+    $("#advisorBadge").className="badge";
+  }
+  const lowConfidence=deep&&analysis.confidence<.45;
+  setStatus(deep?(lowConfidence?"已找到候选桌面，但可用面积/置信度偏低；智能构图会继续执行严格落点检查。":"桌面、保护物、主光方向和反射属性分析完成。"):"快速桌面已显示，继续做精确语义分析…",deep?(lowConfidence?"warn":"ok"):"busy");
+  draw();
+  refreshBusyState();
+  return true;
+}
+
+function segmentWhole(index){
+  // Capture a path that was typed or pasted immediately before the button
+  // click.  Relying only on the input's `change` event is fragile: some
+  // browsers do not commit that event until after the click handler starts,
+  // while this function re-renders the cards before segmentProduct reads the
+  // DOM.  The re-render then used to erase the still-uncommitted path and the
+  // user saw "请选择商品" even though the textbox was visibly populated.
+  const typedSource=$(`#source${index}`)?.value.trim()||"";
+  if(typedSource&&typedSource!==products[index].source){
+    sourceChanged(index,typedSource);
+  }
+  productRevisions[index]+=1;
+  products[index].roi=null;
+  renderCards();
+  return segmentProduct(index,false);
+}
+async function runSegmentProduct(index,request){
+  try{
+    const {source,roi,revision}=request;
+    if(!source)throw new Error(`请选择商品 ${index+1}`);
+    if(revision!==productRevisions[index])return false;
+    products[index].source=source;
+    setStatus(`正在高质量抠取商品 ${index+1}${roi?"的框选目标":""}；先请求 RunningHub，云端不可用会自动切换本地双模型（可能需要 1–2 分钟），商品 RGB 始终来自原图…`,"busy");
+    const cutout=await api("/api/segment",{id:products[index].id,source,quality:"quality",roi});
+    if(revision!==productRevisions[index]||products[index].source!==source)return false;
+    if(cutout.alpha_quality.verdict==="reject"){
+      const reason=cutout.alpha_quality.reason||"自动蒙版没有可靠保留完整商品";
+      const cloudReason=cutout.cloud_fallback_reason
+        ?` RunningHub 未采用：${cutout.cloud_fallback_reason}。`
+        :"";
+      throw new Error(`${reason}。${cloudReason}已阻止错误结果进入画布，请重新框选并把完整商品框紧。`);
+    }
+    const info=await api("/api/info",{path:cutout.rgba});
+    if(revision!==productRevisions[index]||products[index].source!==source)return false;
+    products[index].rgba=cutout.rgba;
+    products[index].preview=cutout.preview;
+    products[index].sourceAspect=info.width/info.height;
+    products[index].alphaQuality=cutout.alpha_quality;
+    products[index].cutoutProvider=cutout.provider||"local";
+    products[index].cloudFallbackReason=cutout.cloud_fallback_reason||"";
+    products[index].cutoutModel=cutout.model||"";
+    const locator=cutout.subject_locator||{};
+    products[index].subject_label=String(locator.subject_label||"").trim();
+    products[index].subject_included_parts=Array.isArray(locator.included_parts)
+      ?locator.included_parts.map(value=>String(value))
+      :[];
+    products[index].subject_locator_confidence=Number(locator.confidence||0);
+    products[index].subject_semantic_verified=Boolean(
+      locator.semantic_verified&&locator.accepted&&!locator.fallback_used
+    );
+    if(products[index].subject_semantic_verified&&products[index].subject_label){
+      products[index].semantic_category=products[index].subject_label
+        .toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")
+        ||products[index].semantic_category;
+    }
+    // A new RGBA has a different source coordinate system.  Any old label
+    // box must be discarded rather than silently protecting unrelated pixels.
+    products[index].identity_status="unknown";
+    products[index].identity_mask=null;
+    products[index].rerender_policy="auto";
+    renderCards();draw();
+    const note=cutout.alpha_quality.reason?` ${cutout.alpha_quality.reason}`:"";
+    const mode=cutout.selection_strategy==="cropped_original_pipeline"
+      ?"框选区域内的原有算法"
+      :(cutout.selection_mode==="auto_subject_box"
+        ?"MiniMax 自动主商品框内的双候选算法"
+        :(cutout.selection_mode==="box"?"框选目标（原算法漏主体后自动修复）":"整张图片"));
+    const model=cutout.model?`，模型 ${cutout.model}`:"";
+    const provider=cutout.provider==="runninghub"?"RunningHub Alpha + 原图 RGB":"本地严格兜底";
+    const fallback=cutout.cloud_fallback_reason?` RunningHub 未采用：${cutout.cloud_fallback_reason}`:"";
+    setStatus(`商品 ${index+1} 已按${mode}抠图，来源 ${provider}，自动可信度 ${Math.round(cutout.alpha_quality.score)}${model}。该数值不是人工真值评分。${note}${fallback}`,cutout.alpha_quality.verdict==="pass"?"ok":"warn");
+    return true;
+  }catch(error){
+    if(request.revision===productRevisions[index])setStatus(error.message,"warn");
+    return false;
+  }
+}
+function segmentProduct(index,useSelection=Boolean(products[index].roi)){
+  syncVisibleProductSources();
+  const request={
+    source:$(`#source${index}`)?.value.trim()||products[index].source,
+    roi:useSelection&&products[index].roi?[...products[index].roi]:null,
+    revision:productRevisions[index]
+  };
+  segmentJobs+=1;
+  setSegmentControlsBusy(true);
+  const run=async()=>{
+    try{return await runSegmentProduct(index,request)}
+    finally{
+      segmentJobs=Math.max(0,segmentJobs-1);
+      setSegmentControlsBusy(segmentJobs>0);
+    }
+  };
+  const queued=segmentQueue.then(run,run);
+  segmentQueue=queued.catch(()=>undefined);
+  return queued;
+}
+async function useRgba(index){
+  beginCriticalTask();
+  const revision=++productRevisions[index];
+  try{
+    const path=products[index].source||$(`#source${index}`).value.trim();
+    if(!path)throw new Error("请选择 RGBA PNG");
+    const info=await api("/api/info",{path});
+    if(revision!==productRevisions[index])return;
+    if(!info.alpha_quality)throw new Error("该图片没有 Alpha 通道，请使用高质量抠图");
+    products[index].rgba=path;products[index].preview=info.preview;
+    products[index].sourceAspect=info.width/info.height;
+    products[index].alphaQuality=info.alpha_quality;
+    products[index].roi=null;
+    products[index].cutoutProvider="direct_rgba";
+    products[index].cloudFallbackReason="";
+    products[index].cutoutModel="";
+    products[index].identity_status="unknown";
+    products[index].identity_mask=null;
+    products[index].rerender_policy="auto";
+    renderCards();draw();setStatus(`商品 ${index+1} 已载入 RGBA。`,"ok");
+  }catch(error){if(revision===productRevisions[index])setStatus(error.message,"warn")}
+  finally{endCriticalTask()}
+}
+
+async function openRoiSelector(index){
+  beginCriticalTask();
+  let revision=productRevisions[index];
+  try{
+    const source=$(`#source${index}`)?.value.trim()||products[index].source;
+    if(!source)throw new Error(`请先选择商品 ${index+1} 的原图`);
+    if(source!==products[index].source){
+      sourceChanged(index,source);
+      revision=productRevisions[index];
+    }
+    products[index].source=source;
+    setStatus(`正在打开商品 ${index+1} 原图，请框住需要的物体…`,"busy");
+    const info=await api("/api/info",{path:source});
+    if(revision!==productRevisions[index]||products[index].source!==source)return;
+    roiProductIndex=index;
+    roiDraft=products[index].roi?[...products[index].roi]:null;
+    roiPurpose="cutout";
+    $("#roiTitle").textContent=`框选商品 ${index+1}：只保留你要的物体`;
+    $("#roiHint").textContent="按住鼠标连续拖一个框，只把完整目标放进框里，四周尽量留一点空隙。书、支架等不要框进去。";
+    $("#roiConfirm").textContent="使用此框并抠图";
+    $("#roiBox").dataset.label="只抠这个框内";
+    $("#roiModal").hidden=false;
+    const image=$("#roiImage");
+    await new Promise((resolve,reject)=>{
+      image.onload=resolve;
+      image.onerror=()=>reject(new Error("商品原图预览载入失败"));
+      image.src=`${info.preview}${info.preview.includes("?")?"&":"?"}t=${Date.now()}`;
+      if(image.complete&&image.naturalWidth)resolve();
+    });
+    updateRoiBox();
+    setStatus("在弹窗原图上按住鼠标，连续拖出商品选区。","ok");
+  }catch(error){
+    closeRoiSelector();
+    if(revision===productRevisions[index])setStatus(error.message,"warn");
+  }
+  finally{endCriticalTask()}
+}
+function closeRoiSelector(){
+  $("#roiModal").hidden=true;
+  roiProductIndex=-1;
+  roiDraft=null;
+  roiPurpose="cutout";
+}
+function clearRoiSelection(){
+  roiDraft=null;
+  updateRoiBox();
+}
+function updateRoiBox(){
+  const box=$("#roiBox");
+  if(!roiDraft){box.hidden=true;return}
+  const [x0,y0,x1,y1]=roiDraft;
+  box.hidden=false;
+  Object.assign(box.style,{
+    left:`${x0*100}%`,top:`${y0*100}%`,
+    width:`${(x1-x0)*100}%`,height:`${(y1-y0)*100}%`
+  });
+}
+function roiPoint(event){
+  const rect=$("#roiImage").getBoundingClientRect();
+  return {
+    x:Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width)),
+    y:Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height))
+  };
+}
+function confirmRoiAndSegment(){
+  if(roiPurpose==="identity"){confirmIdentityMask();return}
+  if(roiProductIndex<0||!roiDraft){setStatus("请先在原图上拖出一个框。","warn");return}
+  const [x0,y0,x1,y1]=roiDraft;
+  if(x1-x0<.02||y1-y0<.02){setStatus("框选区域太小，请把完整商品框进去。","warn");return}
+  const index=roiProductIndex;
+  productRevisions[index]+=1;
+  products[index].roi=[...roiDraft];
+  closeRoiSelector();
+  renderCards();
+  segmentProduct(index,true);
+}
+
+async function openIdentitySelector(index){
+  beginCriticalTask();
+  try{
+    const rgba=products[index].rgba;
+    if(!rgba)throw new Error(`请先完成商品 ${index+1} 的抠图，再框选文字或 Logo`);
+    setStatus(`正在打开商品 ${index+1} 的透明图；请只框文字、Logo、标签或关键图案…`,"busy");
+    const info=await api("/api/info",{path:rgba});
+    roiProductIndex=index;
+    roiDraft=null;
+    roiPurpose="identity";
+    $("#roiTitle").textContent=`框选商品 ${index+1} 的文字 / Logo保护区`;
+    $("#roiHint").textContent="只框文字、Logo、标签或不可重画的图案；不要框整件商品。框选会自动与商品 Alpha 相交。";
+    $("#roiConfirm").textContent="生成身份保护蒙版";
+    $("#roiBox").dataset.label="保护这个区域";
+    $("#roiModal").hidden=false;
+    const image=$("#roiImage");
+    await new Promise((resolve,reject)=>{
+      image.onload=resolve;
+      image.onerror=()=>reject(new Error("透明图预览加载失败"));
+      image.src=`${info.preview}${info.preview.includes("?")?"&":"?"}t=${Date.now()}`;
+      if(image.complete&&image.naturalWidth)resolve();
+    });
+    updateRoiBox();
+    setStatus("请框选需保护的文字、Logo、标签或图案。", "ok");
+  }catch(error){
+    closeRoiSelector();
+    setStatus(error.message,"warn");
+  }finally{endCriticalTask()}
+}
+
+async function confirmIdentityMask(){
+  if(roiProductIndex<0||!roiDraft){setStatus("请先框选文字、Logo或标签。","warn");return}
+  const [x0,y0,x1,y1]=roiDraft;
+  if(x1-x0<.004||y1-y0<.004){setStatus("保护区域太小，请框住完整文字或标签。","warn");return}
+  const index=roiProductIndex;
+  beginCriticalTask();
+  try{
+    const data=await api("/api/create-identity-mask",{
+      rgba:products[index].rgba,roi:[x0,y0,x1,y1]
+    });
+    products[index].identity_mask=data.mask;
+    products[index].identity_status="detected";
+    products[index].rerender_policy=isTransmissiveMaterial(products[index].material_mode)
+      ?"regional":"never";
+    closeRoiSelector();
+    renderCards();draw();
+    setStatus(`已保护 ${Number(data.pixels||0).toLocaleString()} 个商品像素；候选模型不能改动文字、Logo和标签。`,"ok");
+  }catch(error){setStatus(error.message,"warn")}
+  finally{endCriticalTask()}
+}
+
+$("#roiStage").addEventListener("pointerdown",event=>{
+  if(roiProductIndex<0)return;
+  event.preventDefault();
+  const stage=$("#roiStage"),id=event.pointerId,start=roiPoint(event);
+  roiDraft=[start.x,start.y,start.x,start.y];
+  updateRoiBox();
+  stage.setPointerCapture(id);
+  const move=next=>{
+    if(next.pointerId!==id)return;
+    const point=roiPoint(next);
+    roiDraft=[
+      Math.min(start.x,point.x),Math.min(start.y,point.y),
+      Math.max(start.x,point.x),Math.max(start.y,point.y)
+    ];
+    updateRoiBox();
+  };
+  const end=next=>{
+    if(next.pointerId!==id)return;
+    stage.removeEventListener("pointermove",move);
+    stage.removeEventListener("pointerup",end);
+    stage.removeEventListener("pointercancel",end);
+    if(stage.hasPointerCapture(id))stage.releasePointerCapture(id);
+  };
+  stage.addEventListener("pointermove",move);
+  stage.addEventListener("pointerup",end);
+  stage.addEventListener("pointercancel",end);
+});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("#roiModal").hidden)closeRoiSelector()});
+function setHeight(index,value){
+  products[index].height_ratio=Math.max(.035,Math.min(.65,Number(value)||.16));
+  selectedIndex=index;setMode("手动构图",true);draw();
+}
+
+function draw(){
+  if(!backgroundInfo||!$("#backgroundPreview").clientWidth)return;
+  const overlay=$("#overlay");overlay.innerHTML="";
+  const width=$("#backgroundPreview").clientWidth,height=$("#backgroundPreview").clientHeight;
+  const geometry=scene?readGeometry():null;
+  if(geometry&&geometry.support_polygon.length>=3){
+    const ns="http://www.w3.org/2000/svg";
+    const svg=document.createElementNS(ns,"svg");svg.classList.add("surface-svg");svg.setAttribute("viewBox","0 0 100 100");svg.setAttribute("preserveAspectRatio","none");
+    const surface=document.createElementNS(ns,"polygon");surface.setAttribute("class","surface");surface.setAttribute("points",geometry.support_polygon.map(p=>`${p[0]*100},${p[1]*100}`).join(" "));svg.append(surface);
+    for(const polygon of geometry.protected_polygons){
+      const item=document.createElementNS(ns,"polygon");item.setAttribute("class","protected");item.setAttribute("points",polygon.map(p=>`${p[0]*100},${p[1]*100}`).join(" "));svg.append(item);
+    }
+    overlay.append(svg);
+  }
+  products.forEach((product,index)=>{
+    if(!product.preview)return;
+    const itemHeight=height*product.height_ratio;
+    const itemWidth=itemHeight*product.sourceAspect;
+    const item=document.createElement("div");
+    item.className=`item ${selectedIndex===index?"selected":""}`;
+    Object.assign(item.style,{width:`${itemWidth}px`,height:`${itemHeight}px`,left:`${width*product.center_x-itemWidth/2}px`,top:`${height*product.baseline_y-itemHeight}px`});
+    item.dataset.material=product.material_mode||"opaque";
+    item.innerHTML=`<img src="${product.preview}"><span class="label">${index+1}</span><span class="baseline"></span><span class="handle"></span>`;
+    const previewImage=item.querySelector("img");
+    // The live canvas is a placement aid, not the final optical render.  A
+    // raw clear-glass alpha becomes almost invisible after browser-scale
+    // downsampling, even though the target-aware compositor restores its rim,
+    // flutes and base.  Strengthen only the preview outline/contrast so the
+    // operator can judge scale and composition; final product pixels remain
+    // entirely governed by the deterministic material pipeline.
+    if(product.material_mode==="clear_glass"){
+      previewImage.style.filter="contrast(1.38) brightness(1.04) saturate(.90) drop-shadow(0 0 .65px rgba(255,255,255,.62)) drop-shadow(0 0 .50px rgba(12,18,24,.55))";
+    }else if(["frosted_glass","colored_glass","mixed_transparent"].includes(product.material_mode)){
+      previewImage.style.filter="contrast(1.14) saturate(1.05)";
+    }
+    bindMove(item,index,width,height,itemWidth,itemHeight);
+    bindResize(item,item.querySelector(".handle"),index,height);
+    overlay.append(item);
+  });
+}
+function bindMove(element,index,width,height,itemWidth,itemHeight){
+  element.addEventListener("pointerdown",event=>{
+    if(event.target.classList.contains("handle"))return;
+    event.preventDefault();selectedIndex=index;setMode("手动构图",true);
+    const id=event.pointerId,startX=event.clientX,startY=event.clientY;
+    const originX=products[index].center_x,originY=products[index].baseline_y;
+    element.setPointerCapture(id);element.classList.add("selected");
+    const move=next=>{
+      if(next.pointerId!==id)return;
+      products[index].center_x=Math.max(.01,Math.min(.99,originX+(next.clientX-startX)/width));
+      products[index].baseline_y=Math.max(.03,Math.min(.98,originY+(next.clientY-startY)/height));
+      element.style.left=`${width*products[index].center_x-itemWidth/2}px`;
+      element.style.top=`${height*products[index].baseline_y-itemHeight}px`;
+    };
+    const end=next=>{
+      if(next.pointerId!==id)return;
+      element.removeEventListener("pointermove",move);element.removeEventListener("pointerup",end);element.removeEventListener("pointercancel",end);
+      if(element.hasPointerCapture(id))element.releasePointerCapture(id);
+      renderCards();draw();
+    };
+    element.addEventListener("pointermove",move);element.addEventListener("pointerup",end);element.addEventListener("pointercancel",end);
+  });
+}
+function bindResize(element,handle,index,stageHeight){
+  handle.addEventListener("pointerdown",event=>{
+    event.preventDefault();event.stopPropagation();selectedIndex=index;setMode("手动构图",true);
+    const id=event.pointerId,startY=event.clientY,origin=products[index].height_ratio;
+    handle.setPointerCapture(id);
+    const move=next=>{
+      if(next.pointerId!==id)return;
+      products[index].height_ratio=Math.max(.035,Math.min(.65,origin+(next.clientY-startY)/stageHeight));
+      const h=stageHeight*products[index].height_ratio,w=h*products[index].sourceAspect;
+      element.style.height=`${h}px`;element.style.width=`${w}px`;
+      element.style.left=`${$("#backgroundPreview").clientWidth*products[index].center_x-w/2}px`;
+      element.style.top=`${stageHeight*products[index].baseline_y-h}px`;
+    };
+    const end=next=>{
+      if(next.pointerId!==id)return;
+      handle.removeEventListener("pointermove",move);handle.removeEventListener("pointerup",end);handle.removeEventListener("pointercancel",end);
+      if(handle.hasPointerCapture(id))handle.releasePointerCapture(id);
+      renderCards();draw();
+    };
+    handle.addEventListener("pointermove",move);handle.addEventListener("pointerup",end);handle.addEventListener("pointercancel",end);
+  });
+}
+
+function ensureReady(){
+  if(!backgroundInfo||!scene||!deepSceneReady)throw new Error("精确桌面分析尚未完成，请稍候");
+  if(products.some(product=>!product.rgba))throw new Error("请先完成三件商品的抠图");
+}
+function applyProducts(items){
+  for(const item of items){
+    const target=products.find(product=>product.id===item.id);
+    if(!target)continue;
+    Object.assign(target,{
+      center_x:item.center_x,
+      baseline_y:item.baseline_y,
+      height_ratio:item.height_ratio,
+      z_order:item.z_order,
+      placement_mode:item.placement_mode||target.placement_mode||"upright",
+      physical_type:item.physical_type||target.physical_type||"rigid_object",
+      photographed_pose:item.photographed_pose||target.photographed_pose||"unknown",
+      pose_confidence:Number(item.pose_confidence??target.pose_confidence??0),
+      semantic_category:item.semantic_category||target.semantic_category||"decor_object",
+      estimated_real_height_cm:Number(item.estimated_real_height_cm??target.estimated_real_height_cm??20),
+      estimated_height_cm_min:Number(item.estimated_height_cm_min??target.estimated_height_cm_min??15),
+      estimated_height_cm_max:Number(item.estimated_height_cm_max??target.estimated_height_cm_max??30),
+      footprint_width_cm:Number(item.footprint_width_cm??target.footprint_width_cm??12),
+      size_confidence:Number(item.size_confidence??target.size_confidence??0),
+      viewpoint_compatibility:Number(item.viewpoint_compatibility??target.viewpoint_compatibility??.8),
+      source_light_compatibility:Number(item.source_light_compatibility??target.source_light_compatibility??.5),
+      visual_salience:Number(item.visual_salience??target.visual_salience??.5),
+      material_mode:item.material_mode||target.material_mode||"opaque",
+      material_confidence:Number(item.material_confidence??target.material_confidence??0),
+      transmission_strength:Number(item.transmission_strength??target.transmission_strength??0),
+      receiver_width_or_diameter_cm:Number(item.receiver_width_or_diameter_cm??target.receiver_width_or_diameter_cm??100),
+      receiver_size_confidence:Number(item.receiver_size_confidence??target.receiver_size_confidence??0)
+    });
+  }
+  renderCards();draw();
+}
+function layoutReasonText(code){
+  return ({
+    surface_geometry_unavailable:"桌面可用区域不足",
+    too_close_to_front_edge:"商品过于靠近桌面前沿",
+    group_too_close_to_front_edge:"整组商品集中在桌面前沿",
+    group_too_close_to_far_edge:"整组商品过于靠后",
+    insufficient_front_clearance:"商品底座离前沿的安全距离不足",
+    visual_mass_too_small:"商品主体视觉尺寸偏小",
+    visual_scale_imbalance:"商品相对尺寸不协调",
+    object_gaps_too_tight:"相邻商品过于拥挤",
+    uneven_object_gaps:"商品间距不均衡",
+    depth_stagger_too_flat:"三件商品缺少真实前后层次",
+    advisor_repair_too_large:"模型建议需要过大的位置修复",
+    advisor_scale_repair_too_large:"模型建议需要过大的尺寸修复",
+    multiple_advisor_repairs:"多件商品需要重新落位"
+  })[code]||code;
+}
+async function autoLayout(){
+  beginCriticalTask();
+  try{
+    ensureReady();setStatus("正在搜索透视合理、留白均衡且无碰撞的构图…","busy");
+    const geometry=readGeometry();
+    const sceneReceiver=scene?.advisor||{};
+    const data=await api("/api/auto-layout",{
+      background:$("#background").value,products:productPayload(),...geometry,
+      ...sceneGeometryEvidence(),
+      support_mask_path:scene.support_mask_path||null,
+      shadow_direction:[Number($("#shadowX").value),Number($("#shadowY").value)],
+      shadow_length_ratio:Number($("#shadowLength").value),
+      shadow_softness_ratio:Number($("#shadowSoftness").value),
+      receiver_width_or_diameter_cm:
+        Number(sceneReceiver.receiver_width_or_diameter_cm||0)||null,
+      receiver_size_confidence:
+        Number(sceneReceiver.receiver_size_confidence||0)
+    });
+    layoutSnapshot=products.map(product=>({...product}));
+    if(data.support_polygon)$("#supportJson").value=JSON.stringify(data.support_polygon);
+    if(data.protected_polygons)$("#protectedJson").value=JSON.stringify(data.protected_polygons);
+    applyProducts(data.products);
+    const layoutScore=Number(data.metrics?.layout_score??0);
+    const layoutVerdict=String(data.layout_verdict||data.metrics?.layout_verdict||"reject").toLowerCase();
+    // The numeric layout score is diagnostic only.  Hard receiver support,
+    // collision and protected-region checks are represented by the backend
+    // verdict; an arbitrary score must not block a geometrically valid,
+    // human-adjustable commercial composition.
+    const layoutPassed=layoutVerdict==="pass";
+    const reasons=(data.layout_reasons||data.metrics?.layout_reasons||[]).map(layoutReasonText);
+    const reasonText=reasons.length?` 原因：${reasons.slice(0,3).join("；")}。`:"";
+    const replanned=Boolean(
+      data.metrics?.local_joint_replan||data.advisor?.status==="seed_replanned_local"
+    );
+    if(!layoutPassed){
+      setMode("自动构图未通过");
+      setStatus(`已生成可调整草案，但桌面承托、碰撞或保护区门禁拒绝。${reasonText}请拖动或缩放后再严格合成，或重新运行智能构图。`,"warn");
+      return false;
+    }
+    setMode(replanned?"本地联合重排完成":"智能构图完成");
+    const source=replanned
+      ?`MiniMax 仅作商品语义与相对关系种子；原建议未通过桌面表面门禁，本地已联合重排并通过（${layoutScore.toFixed(1)}分）。`
+      :data.advisor?.status==="used"
+        ?`MiniMax 提案已通过本地桌面深度、前沿距离、主体尺度和间距门禁（${layoutScore.toFixed(1)}分，置信度 ${Math.round((data.advisor.confidence||0)*100)}%）。`
+        :`当前使用本地确定性构图并已通过布局门禁（${layoutScore.toFixed(1)}分）；MiniMax 未配置或本次已自动回退。`;
+    const semanticScale=Array.isArray(data.advisor?.semantic_scale)
+      ?data.advisor.semantic_scale.map(item=>
+        `${item.product_id}≈${Number(item.estimated_real_height_cm||0).toFixed(0)}cm / 视角${Math.round(Number(item.viewpoint_compatibility||0)*100)}%`
+      ).join("；")
+      :"";
+    const advisorAttempts=Array.isArray(data.advisor?.attempts)?data.advisor.attempts.length:0;
+    const attemptText=advisorAttempts>1?` MiniMax 已因不确定性独立复核 ${advisorAttempts} 次。`:"";
+    const semanticText=semanticScale?` 语义尺度：${semanticScale}。`:"";
+    setStatus(`${source}${attemptText}${semanticText} 布局分只作诊断；最终以人工肉眼验收为准。`,"ok");
+    return true;
+  }catch(error){setStatus(error.message,"warn");return false}
+  finally{endCriticalTask()}
+}
+async function prepareAll(){
+  beginCriticalTask();
+  try{
+    // Capture all three visible paths before the first cutout re-renders the
+    // cards.  This also makes pasted/automated input as reliable as choosing
+    // files through the thumbnail browser; otherwise product 2/3 can vanish
+    // from DOM state after product 1 finishes.
+    syncVisibleProductSources();
+    if(!backgroundInfo)await loadBackground();
+    if(!deepSceneReady&&deepScenePromise)await deepScenePromise;
+    if(!deepSceneReady)throw new Error("精确桌面分析尚未完成，请稍候后重试");
+    for(let index=0;index<products.length;index++){
+      if(products[index].rgba)continue;
+      if(!await segmentProduct(index))return;
+    }
+    await autoLayout();
+  }catch(error){setStatus(error.message,"warn")}
+  finally{endCriticalTask()}
+}
+async function repairLayout(){
+  beginCriticalTask();
+  try{
+    ensureReady();setStatus("正在保留当前构图并修复越界/碰撞…","busy");
+    const geometry=readGeometry();
+    const data=await api("/api/repair-layout",{background:$("#background").value,products:productPayload(),...geometry,...sceneGeometryEvidence(),support_mask_path:scene.support_mask_path||null});
+    applyProducts(data.products);setMode("安全吸附完成");
+    setStatus(data.messages.length?data.messages.join("；"):"当前手动构图合法，无需修改。","ok");
+  }catch(error){setStatus(error.message,"warn")}
+  finally{endCriticalTask()}
+}
+function resetView(){
+  if(!layoutSnapshot){setStatus("还没有可撤销的构图。","warn");return}
+  layoutSnapshot.forEach((snapshot,index)=>Object.assign(products[index],snapshot));
+  renderCards();draw();setMode("已撤销",true);setStatus("已恢复到上次智能构图前。","ok");
+}
+function refinementShouldReplaceInitial(initialReview, refinedReview){
+  // A repair is a deterministic, predeclared second candidate -- not a
+  // prompt/seed retry.  It may replace the initial candidate only when the
+  // independent five-slot consensus is meaningfully better and it introduces
+  // no additional critical failure.  This prevents a lower-scoring repair from
+  // overwriting the first result merely because it ran later.
+  if(!refinedReview)return false;
+  if(!initialReview)return true;
+  if(refinedReview.pixel_verdict!=="pass")return false;
+  if(initialReview.pixel_verdict!=="pass")return true;
+  const initialCritical=(initialReview.critical_failures||[]).length;
+  const refinedCritical=(refinedReview.critical_failures||[]).length;
+  if(refinedCritical>initialCritical)return false;
+  const initialScore=Number(initialReview.visual_score||0);
+  const refinedScore=Number(refinedReview.visual_score||0);
+  // Five independent slots reduce noise, but a small fixed margin still keeps
+  // stochastic model drift from silently choosing the newest image. Fewer
+  // critical findings cannot compensate for a lower aggregate score: both
+  // candidates remain blocked below 90, and the screen must never regress.
+  if(refinedScore<initialScore+0.5)return false;
+  return refinedCritical<=initialCritical;
+}
+async function compose(){
+  beginCriticalTask();
+  try{
+    lastComposeResult=null;
+    lastVisualReview=null;
+    const strictAudit=$("#strictAuditEnabled").checked;
+    ensureReady();setStatus(
+      strictAudit
+        ?"正在按当前摆位生成完整4K结果并执行正式交付审计…"
+        :"正在按当前摆位生成完整4K调试结果；仅跳过末端审计门禁…",
+      "busy"
+    );
+    const geometry=readGeometry();
+    const mode=$("#reflectionMode").value;
+    const reflection=mode==="on"||(mode==="auto"&&scene.reflection_recommended);
+    const baseComposePayload={
+      background:$("#background").value,products:productPayload(),...geometry,
+      ...sceneGeometryEvidence(),
+      support_mask_path:scene.support_mask_path||null,
+      shadow_direction:[Number($("#shadowX").value),Number($("#shadowY").value)],
+      shadow_length_ratio:Number($("#shadowLength").value),
+      shadow_opacity:Number($("#shadowOpacity").value),
+      shadow_softness_ratio:Number($("#shadowSoftness").value),
+      reflection_enabled:reflection,
+      reflection_opacity:Number($("#reflectionOpacity").value),
+      cast_shadow_mode:scene.cast_shadow_mode||"directional",
+      surface_material:scene.surface_material||"unknown",
+      surface_reflectivity:Number(scene.reflectivity||0),
+      surface_roughness:Number(scene.surface_roughness??.55),
+      direct_light_fraction:Number(scene.direct_light_fraction??.55),
+      contact_ao_strength:Number(scene.contact_ao_strength??1),
+      auto_repair:$("#autoRepair").checked,
+      strict_audit:strictAudit,
+      output_long_edge:3840,
+      learned_effects_enabled:$("#learnedEffectsEnabled").checked,
+      hybrid_rerender_enabled:$("#hybridRerenderEnabled").checked,
+      hybrid_provider:$("#hybridProvider").value,
+      hybrid_candidate:$("#hybridCandidate").value.trim()||null,
+      hybrid_prompt:$("#hybridPrompt").value.trim()||undefined
+    };
+    let data=await api("/api/compose",{...baseComposePayload,refinement_pass:0});
+    lastComposeResult=data;
+    applyProducts(data.products);
+    setStatus(
+      strictAudit
+        ?"正式审计完成；正在整理结果…"
+        :"4K调试渲染完成；正在整理分层与光学Matte结果…",
+      "busy"
+    );
+    let review=null,reviewError="",automaticRefinement=null;
+    const runAiReview=$("#aiReviewAfterCompose").checked;
+    if(runAiReview){
+      try{
+        review=await requestVisualReviewWithRecovery({
+          background:$("#background").value,final_path:data.final_path,
+          products:products.map(product=>product.rgba)
+        });
+        lastVisualReview=review;
+      }catch(error){reviewError=error.message}
+    }
+    const firstScore=review?Number(review.visual_score):null;
+    const firstSubscores=review?.subscores||{};
+    const firstPassed=Boolean(
+      review&&review.verdict==="pass"&&review.batch_unlock===true&&
+      review.pixel_verdict==="pass"&&firstScore>=90
+    );
+    // Scores are diagnostic evidence, not a rendering objective.  The former
+    // automatic second pass strengthened shadows/reflections until they were
+    // easier for a model to count, even when the first photograph looked more
+    // elegant.  Keep the current placement and material route deterministic;
+    // a user may still request an explicit repair from the dedicated control.
+    const repairableVisualFailure=false;
+    if(repairableVisualFailure){
+      setStatus(`首轮视觉评审 ${firstScore.toFixed(1)} 分；正在生成新的确定性接地/光色修复候选并再次复核…`,"busy");
+      const firstRun=data.run;
+      const firstData=data;
+      const firstReview=review;
+      // This is not another layout attempt.  The server receives the exact
+      // first-pass placement snapshot and its run id, then reloads the locked
+      // product transforms/materials/RGB gains from that persisted job.
+      const lockedProducts=JSON.parse(JSON.stringify(firstData.products));
+      const refinedData=await api("/api/compose",{
+        ...baseComposePayload,
+        products:lockedProducts,
+        auto_repair:false,
+        refinement_pass:1,
+        refinement_base_run:firstRun
+      });
+      try{
+        const refinedReview=await requestVisualReviewWithRecovery({
+          background:$("#background").value,final_path:refinedData.final_path,
+          products:products.map(product=>product.rgba)
+        });
+        const useRefined=refinementShouldReplaceInitial(firstReview,refinedReview);
+        data=useRefined?refinedData:firstData;
+        review=useRefined?refinedReview:firstReview;
+        applyProducts(data.products);
+        lastComposeResult=data;
+        lastVisualReview=review;
+        automaticRefinement={
+          first_score:firstScore,second_score:Number(refinedReview.visual_score||0),
+          first_run:firstRun,second_run:refinedData.run,
+          selected_candidate:useRefined?"refined":"initial"
+        };
+        reviewError="";
+      }catch(error){
+        // A failed second review is transport/payload failure, not a reason to
+        // discard a valid first consensus.  Keep the first candidate blocked
+        // or passed according to its own immutable result.
+        data=firstData;review=firstReview;
+        applyProducts(data.products);
+        lastComposeResult=data;
+        lastVisualReview=review;
+        reviewError=`修复候选评审不可用，已保留首轮结果：${error.message}`;
+        automaticRefinement={
+          first_score:firstScore,first_run:firstRun,second_run:refinedData.run,
+          selected_candidate:"initial"
+        };
+      }
+    }
+    const warning=data.warnings.length?`<div class="audit" style="color:#ffca7b">${escapeHtml(data.warnings.join("；"))}</div>`:"";
+    const hybrid=data.audit?.hybrid_render||{};
+    const hybridText=hybrid.status==="applied"
+      ?`混合重渲染已应用：${escapeHtml(hybrid.provider||"candidate")}；授权像素 ${Number(hybrid.effective_pixels||0).toLocaleString()}；文字/轮廓区变化 0。`
+      :hybrid.status==="strict_fallback"
+        ?`混合重渲染已安全回退严格结果：${escapeHtml(hybrid.reason||"无可用候选")}`
+        :"当前使用严格合成；未请求生成候选。";
+    const hybridHtml=`<div class="audit" style="color:${hybrid.status==="applied"?"#74e4b4":"#9bb0cc"}">${hybridText}</div>`;
+    const artifactLabels={
+      strict_base:"严格底图",rerender_mask:"可编辑蒙版",
+      identity_guard:"身份/轮廓保护蒙版",candidate_registered:"候选图（已注册）"
+    };
+    const artifactHtml=Object.entries(data.hybrid_artifacts||{}).map(([key,url])=>
+      `<a class="audit" style="margin-right:10px;color:#79b2ff" target="_blank" href="${url}">${artifactLabels[key]||key}</a>`
+    ).join("");
+    const score=review?Number(review.visual_score):null;
+    const reviewPassed=Boolean(
+      review&&review.verdict==="pass"&&review.batch_unlock===true&&
+      review.pixel_verdict==="pass"&&score>=90
+    );
+    const deliveryReady=Boolean(
+      strictAudit&&
+      data.pixel_verdict==="pass"&&
+      data.physical_verdict==="pass"&&
+      data.delivery_verdict==="pending_visual_review"&&
+      data.audit?.physical_audit?.verdict==="pass"&&
+      Number(data.audit?.pixel_audit?.changed_pixels||0)===0&&
+      Number(data.audit?.pixel_audit?.max_delta||0)===0
+    );
+    const reviewIssues=review?[...(review.critical_failures||[]),...(review.issues||[])].slice(0,4):[];
+    const reviewSlots=Array.isArray(review?.review_slots)?review.review_slots:[];
+    const evidenceMapping=reviewSlots.find(slot=>Array.isArray(slot?.evidence_mapping))?.evidence_mapping||[];
+    const evidencePairs=evidenceMapping.map(item=>
+      `${item.product_id}原图<->${item.detail_available?`${item.product_id}细节`:"无细节裁剪"}`
+    );
+    const reviewCount=Number(review?.review_count||reviewSlots.length||0);
+    const subscoreLabels={grounding:"接地",cast_shadows:"投影",geometry_layout:"几何",lighting_color:"光色",cutout_edges:"边缘",reflection_material:"材质"};
+    const subscoreText=review?.subscores?Object.entries(subscoreLabels).map(
+      ([key,label])=>`${label} ${Number(review.subscores[key]||0).toFixed(1)}`
+    ).join(" · "):"";
+    const rawAdvisory=Number(review?.aggregation?.raw_model_advisory_score||0);
+    const physicalDimensions=Array.isArray(review?.aggregation?.physical_dimensions)
+      ?review.aggregation.physical_dimensions.map(key=>subscoreLabels[key]||key).join("、")
+      :"接地、投影、几何、边缘身份";
+    const evidenceText=evidencePairs.length?evidencePairs.join("；"):
+      products.map(product=>`${product.id}原图<->${product.id}细节`).join("；");
+    const refinementHtml=automaticRefinement
+      ?`<div class="audit">自动修复链：首轮 ${automaticRefinement.first_score.toFixed(1)} 分 → 在首轮锁定的商品像素、摆位、尺寸、材质与色彩上，仅重渲染光影层 → MiniMax 复核；选用 ${automaticRefinement.selected_candidate==="refined"?"修复候选":"首轮候选"}。第二轮仍不合格即停止，不对同一图片刷分。</div>`
+      :"";
+    const reviewPolicyHtml=review?`<div class="audit">
+      保守证据评分：${escapeHtml(physicalDimensions)}由本地像素层验证硬约束，同时由 MiniMax ${reviewCount||5}路独立检查真实观感；两者取较低值，数学上存在的阴影如果看起来仍然浮空也会拒绝。<br>
+      商品证据一一映射：${escapeHtml(evidenceText)}。浅色/透明材质必须先与同 ID 原图比较；真实缺陷不豁免。90 分与维度下限门禁未降低。
+      ${rawAdvisory?`<br>MiniMax 原始主观参考分 ${rawAdvisory.toFixed(1)}；`:""}${subscoreText?`融合维度：${escapeHtml(subscoreText)}`:""}
+    </div>`:"";
+    const reviewHtml=review
+      ?`<div class="audit" style="color:${reviewPassed?"#74e4b4":"#ffca7b"}">MiniMax 辅助参考分 ${score.toFixed(1)}/100 · verdict=${escapeHtml(review.verdict)}${reviewIssues.length?`<br>观察项：${escapeHtml(reviewIssues.join("；"))}`:""}<br>该分数只作诊断，不替代人工肉眼验收，也不控制下载。</div>${refinementHtml}${reviewPolicyHtml}`
+      :`<div class="audit" style="color:#9bb0cc">未运行 AI 视觉评分；当前结果等待人工肉眼验收。${reviewError?`<br>${escapeHtml(reviewError)}`:""}</div>`;
+    const resultPreview=`${data.final}${data.final.includes("?")?"&":"?"}t=${Date.now()}`;
+    const deliveryUrl=`/api/deliver?path=${encodeURIComponent(data.final_path)}`;
+    const deliveryAction=deliveryReady
+      ?`<a href="${deliveryUrl}" download style="color:#79b2ff">下载 4K 人工验收候选 PNG</a>`
+      :(strictAudit
+        ?`<span class="audit" style="color:#ffca7b">像素或几何硬门禁未通过，下载未开放</span>`
+        :`<a href="${data.final}" download style="color:#79b2ff">下载 4K 调试预览 PNG</a>`);
+    const auditText=strictAudit
+      ?`背景审计：changed_pixels=${data.audit.pixel_audit.changed_pixels}，max_delta=${data.audit.pixel_audit.max_delta}`
+      :"正式审计已关闭；渲染、分层PNG和光学Matte均已保留";
+    const resultTitle=strictAudit?"4K 正式审计合成结果":"4K 调试合成结果";
+    const resultBadge=strictAudit?(deliveryReady?"等待人工验收":"硬门禁拒绝"):"调试预览·未审计";
+    $("#result").innerHTML=`<div class="result"><div class="result-head"><div><div class="result-title">${resultTitle}</div><div class="audit">输出 ${data.output_dimensions[0]} × ${data.output_dimensions[1]}；${auditText}</div>${hybridHtml}${artifactHtml?`<div class="audit">${artifactHtml}</div>`:""}${warning}${reviewHtml}</div><div><span class="badge ${deliveryReady?"good":"manual"}">${resultBadge}</span> ${deliveryAction}</div></div><img src="${resultPreview}"></div>`;
+    setStatus(
+      strictAudit
+        ?(deliveryReady?"合成与正式审计通过，等待人工肉眼验收。":"正式审计未通过，当前结果不可交付。")
+        :"4K调试结果已生成。质量链路全部保留，仅未运行末端交付审计。",
+      strictAudit?(deliveryReady?"ok":"warn"):"ok"
+    );
+  }catch(error){setStatus(error.message,"warn")}
+  finally{endCriticalTask()}
+}
+
+function installLearnedEffectsControls(){
+  const hybridToggle=$("#hybridRerenderEnabled")?.closest("label");
+  if(hybridToggle&&!$("#learnedEffectsEnabled")){
+    hybridToggle.insertAdjacentHTML(
+      "beforebegin",
+      '<label class="check"><input id="learnedEffectsEnabled" type="checkbox">本次合成启用学习阴影 V1（第二道开关；仅替换阴影 Alpha）</label>'
+    );
+  }
+  const grid=$("#cloudSettings")?.querySelector(".integration-grid");
+  if(grid&&!$("#runninghubLearnedEnabled")){
+    grid.insertAdjacentHTML("beforeend",`
+      <details>
+        <summary>学习阴影 V1 配置（RunningHub / ComfyUI）</summary>
+        <label class="check"><input id="runninghubLearnedEnabled" type="checkbox">配置总开关：允许本机调用付费学习阴影 V1 工作流</label>
+        <div class="selection-note active">V1 只接收一张单通道阴影 Alpha；Normal 与提示词节点均为必填。保存配置不会自动用于合成，每次仍需单独勾选“本次合成启用学习阴影 V1”。</div>
+        <div id="learnedCloudState" class="cloud-state">学习阴影 V1：ready=false · secret_configured=false · workflow_configured=false</div>
+        <div class="integration-row"><label>任务类型</label><select id="runninghubLearnedMode"><option value="comfyui">ComfyUI 工作流</option><option value="ai_app">AI 应用</option></select></div>
+        <div class="integration-row"><label>应用/工作流 ID（V1 必填）</label><input id="runninghubLearnedAppId" placeholder="V1 学习阴影专用流程 ID" aria-required="true"></div>
+        <div class="integration-row"><label>无影场景节点（V1 必填）</label><input id="runninghubLearnedSourceNode" placeholder="V1 必填" aria-required="true"></div>
+        <div class="integration-row"><label>场景字段</label><input id="runninghubLearnedSourceField" value="image"></div>
+        <div class="integration-row"><label>商品 ID 蒙版节点（V1 必填）</label><input id="runninghubLearnedProductMaskNode" placeholder="V1 必填" aria-required="true"></div>
+        <div class="integration-row"><label>商品蒙版字段</label><input id="runninghubLearnedProductMaskField" value="image"></div>
+        <div class="integration-row"><label>几何证据节点（V1 必填）</label><input id="runninghubLearnedGeometryNode" placeholder="深度/支持面/保护区，V1 必填" aria-required="true"></div>
+        <div class="integration-row"><label>几何证据字段</label><input id="runninghubLearnedGeometryField" value="image"></div>
+        <div class="integration-row"><label>法线节点（V1 必填）</label><input id="runninghubLearnedNormalNode" placeholder="V1 必填" aria-required="true"></div>
+        <div class="integration-row"><label>法线字段</label><input id="runninghubLearnedNormalField" value="image"></div>
+        <div class="integration-row"><label>原背景节点</label><input id="runninghubLearnedBackgroundNode" placeholder="可选"></div>
+        <div class="integration-row"><label>原背景字段</label><input id="runninghubLearnedBackgroundField" value="image"></div>
+        <div class="integration-row"><label>提示词节点（V1 必填）</label><input id="runninghubLearnedPromptNode" placeholder="V1 必填；承载光向、长度和柔化参数" aria-required="true"></div>
+        <div class="integration-row"><label>提示词字段</label><input id="runninghubLearnedPromptField" value="prompt"></div>
+        <div class="integration-row"><label>阴影输出节点（V1 必填）</label><input id="runninghubLearnedShadowOutputNode" placeholder="V1 必填；单通道 Alpha" aria-required="true"></div>
+        <div class="integration-row"><label>阴影编码</label><select id="runninghubLearnedShadowEncoding"><option value="white_is_shadow">白色表示阴影</option><option value="black_is_shadow">黑色表示阴影</option></select></div>
+        <div class="integration-row"><label>亮度增益输出（V2 未开放）</label><input id="runninghubLearnedGainOutputNode" value="" placeholder="V2 未开放（当前不提交）" disabled aria-disabled="true"></div>
+        <div class="integration-row"><label>高光残差输出（V2 未开放）</label><input id="runninghubLearnedSpecularOutputNode" value="" placeholder="V2 未开放（当前不提交）" disabled aria-disabled="true"></div>
+      </details>
+    `);
+  }
+  const actions=$("#cloudSettings")?.querySelector(".integration-actions");
+  if(actions&&!$("#testLearnedEffectsButton")){
+    actions.insertAdjacentHTML(
+      "beforeend",
+      '<button id="testLearnedEffectsButton" class="ghost" onclick="testCloud(\'runninghub_learned\')">测试学习阴影 V1 配置</button>'
+    );
+  }
+  applyLearnedInterfaceState();
+}
+window.addEventListener("resize",draw);
+installLearnedEffectsControls();
+renderCards();
+loadCloudSettings();
+</script>
+</body>
+</html>

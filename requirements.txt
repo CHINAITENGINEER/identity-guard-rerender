@@ -1,0 +1,4 @@
+-r requirements-core.txt
+# Local browser workbench; model packages are optional.
+fastapi>=0.110,<1
+uvicorn>=0.27,<1
