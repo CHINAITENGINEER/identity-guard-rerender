@@ -1,4 +1,6 @@
-# Re-render Protection
+# IdentityGuard
+
+Identity-preserving Product Compositing and Regional Re-rendering
 
 **面向商品图像合成的身份保护与材质分区局部重渲染研究原型。**
 
@@ -17,8 +19,8 @@
 演示用于验证编辑范围和像素恢复，不用于证明摄影真实感或正式视觉验收。
 
 ```powershell
-git clone https://github.com/CHINAITENGINEER/re-reder-protectionre-reder-protection.git
-cd re-reder-protectionre-reder-protection
+git clone https://github.com/CHINAITENGINEER/identity-guard-rerender.git
+cd identity-guard-rerender
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-core.txt -c constraints-tested.txt

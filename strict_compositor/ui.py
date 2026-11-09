@@ -103,7 +103,7 @@ WORK = ROOT / "ui_workspace"
 SCENE_CACHE = WORK / "scene_cache"
 ADVISOR_CACHE = WORK / "minimax_advice"
 UPLOADS = WORK / "uploads"
-app = FastAPI(title="Strict Compositor Studio", version="3.78")
+app = FastAPI(title="IdentityGuard Studio", version="3.78")
 
 # Full-quality extraction is expensive.  Serialize jobs so several browser
 # clicks cannot run two matte models concurrently and kill the local server.
